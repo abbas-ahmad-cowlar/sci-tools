@@ -71,16 +71,32 @@
         for (let k = 0; k < p; k++) A[j][k] += w * b[j] * b[k];
       }
     }
-    const beta = linalg.solve(A, g);
-    if (!beta) return { ok: false, message: 'Singular system — try a lower degree or more data.' };
+
+    // Jacobi (diagonal) preconditioning: solve the column-scaled system
+    // (DAD) y = D g with D = diag(1/√Aⱼⱼ), then recover β = D y. This is
+    // mathematically identical to solving A β = g, but sharply lowers the
+    // condition number of high-degree polynomial (Vandermonde) systems, so
+    // the coefficients and their errors stay trustworthy at higher degree.
+    const d = new Array(p);
+    for (let j = 0; j < p; j++) d[j] = A[j][j] > 0 ? 1 / Math.sqrt(A[j][j]) : 1;
+    const As = linalg.zeros(p, p);
+    const gs = new Array(p);
+    for (let j = 0; j < p; j++) {
+      gs[j] = g[j] * d[j];
+      for (let k = 0; k < p; k++) As[j][k] = A[j][k] * d[j] * d[k];
+    }
+    const y = linalg.solve(As, gs);
+    if (!y) return { ok: false, message: 'Singular system — try a lower degree or more data.' };
+    const beta = new Array(p);
+    for (let j = 0; j < p; j++) beta[j] = y[j] * d[j];
 
     const predict = (x) => { const b = basisOf(x); let s = 0; for (let j = 0; j < p; j++) s += beta[j] * b[j]; return s; };
     const met = metrics(xs, ys, predict, p, weights);
-    const inv = linalg.invert(A);
+    const invAs = linalg.invert(As);            // cov = D · inv(As) · D
     const errors = new Array(p).fill(NaN);
-    if (inv) {
+    if (invAs) {
       const scale = met.dof > 0 ? met.chi2 / met.dof : 1;
-      for (let j = 0; j < p; j++) errors[j] = Math.sqrt(Math.max(0, inv[j][j] * scale));
+      for (let j = 0; j < p; j++) errors[j] = Math.sqrt(Math.max(0, invAs[j][j] * d[j] * d[j] * scale));
     }
     return { ok: true, params: beta, errors, predict, metrics: met, iterations: 1, converged: true };
   }

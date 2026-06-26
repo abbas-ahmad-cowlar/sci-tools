@@ -1,6 +1,6 @@
 /* =========================================================================
    PhotonBench — precise optical-instrument aesthetic.
-   Graphite field, hairline rules, IBM Plex Mono numerics, Sora labels,
+   Graphite field, hairline rules, IBM Plex Mono numerics, IBM Plex Sans labels,
    the visible spectrum as the one chromatic accent.
    ========================================================================= */
 
@@ -19,7 +19,7 @@
   --good:      #7bd88f;
   --bad:       #ff7d6b;
 
-  --sans: 'Sora', 'Segoe UI', system-ui, sans-serif;
+  --sans: 'IBM Plex Sans', 'Segoe UI', system-ui, sans-serif;
   --mono: 'IBM Plex Mono', 'Cascadia Mono', 'Consolas', ui-monospace, monospace;
 }
 

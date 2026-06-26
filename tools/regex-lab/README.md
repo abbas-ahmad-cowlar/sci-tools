@@ -49,8 +49,8 @@ One `index.html`. No dependencies. The interesting parts:
 | **Railroad** | A small SVG layout engine. Each node measures itself and returns an entry/exit rail axis; sequences flow horizontally, alternations fan out with bezier rails, quantifiers draw bypass/loop paths. |
 | **Tester**   | Uses the browser's own `RegExp` engine for matching/replacement, so behaviour is exactly what your JS code will see. |
 
-Fonts (Martian Mono, JetBrains Mono, Familjen Grotesk) load from Google Fonts when
-online and fall back to system mono/sans when offline.
+Fonts (Fraunces, IBM Plex Sans/Mono) are bundled locally with the Sci-Tools suite —
+nothing loads from the network, so the tool works fully offline and privately.
 
 ## Notes & limits
 

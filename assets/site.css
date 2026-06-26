@@ -140,7 +140,6 @@ body {
 }
 .hero h1 em {
   font-style: italic;
-  font-variation-settings: "SOFT" 80, "WONK" 1;
   color: var(--cyan);
 }
 .hero .lede {
@@ -177,13 +176,15 @@ body {
   padding: 18px;
   box-shadow: 0 30px 80px -40px rgba(0,0,0,0.9), inset 0 1px 0 rgba(255,255,255,0.03);
 }
+.scope-head {
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: 8px 14px; flex-wrap: wrap; margin-bottom: 10px;
+}
 .scope .scope-label {
-  position: absolute; top: 14px; left: 18px;
   font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.16em;
   text-transform: uppercase; color: var(--ink-faint);
 }
 .scope .scope-readout {
-  position: absolute; top: 14px; right: 18px;
   font-family: var(--mono); font-size: 10.5px; color: var(--cyan); opacity: .85;
 }
 .scope svg { display: block; width: 100%; height: auto; }

@@ -5,9 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Regex Lab — dissect, test &amp; understand regular expressions</title>
 <meta name="description" content="An offline workbench for regular expressions: live testing, plain-English explanations, railroad diagrams, capture groups and substitution preview." />
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Martian+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/fonts.css">
 <style>
 /* ============================================================
    REGEX LAB — a precision instrument for regular expressions
@@ -35,9 +33,9 @@
   --rose:#ff6b6b;
   --mint:#5ff0b4;
   --shadow:0 16px 40px -16px rgba(0,0,0,.7);
-  --font-ui:'Familjen Grotesk',ui-sans-serif,system-ui,-apple-system,sans-serif;
-  --font-mono:'JetBrains Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;
-  --font-label:'Martian Mono',ui-monospace,monospace;
+  --font-ui:'IBM Plex Sans',ui-sans-serif,system-ui,-apple-system,sans-serif;
+  --font-mono:'IBM Plex Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+  --font-label:'IBM Plex Mono',ui-monospace,monospace;
   --r:12px;
   --r-sm:8px;
 }
@@ -762,7 +760,7 @@ function describeFlags(){
 /* ===================== 3. RAILROAD DIAGRAM ===================== */
 const SVGNS = 'http://www.w3.org/2000/svg';
 const D = {
-  font: '13px "JetBrains Mono", ui-monospace, monospace',
+  font: '13px "IBM Plex Mono", ui-monospace, monospace',
   boxH: 32, padX: 11, hGap: 18, vGap: 14, lead: 26,
   groupPadX: 16, groupPadTop: 24, groupPadBot: 12,
 };
@@ -803,7 +801,7 @@ function term(label, kind, sub, rounded){
       const rx = rounded ? 7 : h/2; // literals: rounded-rect; tokens: stadium
       return `<g>
         <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${rx}" fill="rgba(255,255,255,.025)" stroke="${col}" stroke-width="1.3"/>
-        <text x="${x+w/2}" y="${y+h/2}" fill="${col}" font-family="JetBrains Mono, monospace" font-size="13" text-anchor="middle" dominant-baseline="central">${esc(label)}</text>
+        <text x="${x+w/2}" y="${y+h/2}" fill="${col}" font-family="IBM Plex Mono, monospace" font-size="13" text-anchor="middle" dominant-baseline="central">${esc(label)}</text>
       </g>`;
     }
   };
@@ -907,7 +905,7 @@ function layoutQuant(node){
       if (label){
         const lw = textW(label)+10;
         const ly = needLoop ? y+h-6 : A;
-        out += `<g><rect x="${x+w/2-lw/2}" y="${ly-9}" width="${lw}" height="18" rx="9" fill="#0c100f" stroke="var(--amber)" stroke-width="1"/><text x="${x+w/2}" y="${ly}" fill="var(--amber)" font-family="JetBrains Mono,monospace" font-size="10.5" text-anchor="middle" dominant-baseline="central">${esc(label)}</text></g>`;
+        out += `<g><rect x="${x+w/2-lw/2}" y="${ly-9}" width="${lw}" height="18" rx="9" fill="#0c100f" stroke="var(--amber)" stroke-width="1"/><text x="${x+w/2}" y="${ly}" fill="var(--amber)" font-family="IBM Plex Mono,monospace" font-size="10.5" text-anchor="middle" dominant-baseline="central">${esc(label)}</text></g>`;
       }
       return out;
     }
@@ -944,7 +942,7 @@ function layoutGroup(node){
       const A = y+ay;
       let out='';
       out += `<rect x="${x+1}" y="${y+1}" width="${w-2}" height="${h-2}" rx="10" fill="rgba(255,255,255,.012)" stroke="${col}" stroke-width="1.2" ${dashed?'stroke-dasharray="5 4"':''} opacity=".9"/>`;
-      out += `<text x="${x+12}" y="${y+13}" fill="${col}" font-family="Martian Mono, monospace" font-size="9.5" letter-spacing="1" dominant-baseline="central">${esc(tag.toUpperCase())}</text>`;
+      out += `<text x="${x+12}" y="${y+13}" fill="${col}" font-family="IBM Plex Mono, monospace" font-size="9.5" letter-spacing="1" dominant-baseline="central">${esc(tag.toUpperCase())}</text>`;
       out += line(x, A, x+px, A);
       out += inner.draw(x+px, y+pt);
       out += line(x+px+inner.w, A, x+w, A);
@@ -974,7 +972,7 @@ function renderDiagram(){
     root.draw(pad+startStub, pad) +
     line(pad+startStub+root.w, ay, W-pad, ay) +
     `<circle cx="${W-pad}" cy="${ay}" r="4" fill="var(--acid)"/>`;
-  const svg = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="${SVGNS}" font-family="JetBrains Mono, monospace">${body}</svg>`;
+  const svg = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="${SVGNS}" font-family="IBM Plex Mono, monospace">${body}</svg>`;
   pane.innerHTML =
     `<div class="diagram-tools"><div class="legend">
       <span><i style="background:#b6f24a"></i>literal</span>
@@ -1306,17 +1304,30 @@ document.addEventListener('keydown', e=>{ if (e.key==='Escape') $('#cheat-modal'
 function serialize(){
   return { p:els.pattern.value, f:currentFlags(), t:els.test.value, r:state.replacement, tab:state.activeTab };
 }
+// UTF-8-safe base64 (replaces the deprecated escape/unescape pair)
+function b64FromStr(str){
+  const bytes = new TextEncoder().encode(str);
+  let bin = '';
+  for (let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+  return btoa(bin);
+}
+function strFromB64(b64){
+  const bin = atob(b64);
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  return new TextDecoder().decode(bytes);
+}
 function saveState(){
   try { localStorage.setItem('regexlab', JSON.stringify(serialize())); } catch(e){}
   // lightweight hash (debounced via rAF already)
   const data = serialize();
-  const enc = encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(data)))));
+  const enc = encodeURIComponent(b64FromStr(JSON.stringify(data)));
   history.replaceState(null, '', '#' + enc);
 }
 function loadState(){
   let data = null;
   if (location.hash.length > 1){
-    try { data = JSON.parse(decodeURIComponent(escape(atob(decodeURIComponent(location.hash.slice(1)))))); } catch(e){ data = null; }
+    try { data = JSON.parse(strFromB64(decodeURIComponent(location.hash.slice(1)))); } catch(e){ data = null; }
   }
   if (!data){
     try { data = JSON.parse(localStorage.getItem('regexlab')); } catch(e){}

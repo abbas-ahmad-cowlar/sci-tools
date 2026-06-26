@@ -9,9 +9,7 @@
 <meta property="og:title" content="Sci-Tools — offline calculators for the lab">
 <meta property="og:description" content="Five offline, zero-dependency science &amp; engineering calculators, plus three interactive physics demos. Open source, MIT.">
 <meta property="og:type" content="website">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,600&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/fonts.css">
 <link rel="stylesheet" href="assets/site.css">
 </head>
 <body>
@@ -44,8 +42,10 @@
 
     <!-- oscilloscope plot -->
     <div class="scope" aria-hidden="true">
-      <span class="scope-label">trace · damped oscillation</span>
-      <span class="scope-readout" id="readout">A·e^(−t/τ)·cos ωt</span>
+      <div class="scope-head">
+        <span class="scope-label">trace · damped oscillation</span>
+        <span class="scope-readout" id="readout">A·e^(−t/τ)·cos ωt</span>
+      </div>
       <svg viewBox="0 0 600 280" preserveAspectRatio="none">
         <g id="gridlines"></g>
         <line class="axis" x1="20" y1="145" x2="580" y2="145"></line>

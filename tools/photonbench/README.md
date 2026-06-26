@@ -4,8 +4,8 @@ A fast, offline desk tool for anyone working in optics/photonics. Convert
 between the ways we describe light, do dimensional arithmetic, juggle optical
 power in dB, and grab physical constants — all in one local page.
 
-Open `index.html`. No build, no dependencies, no network (web fonts degrade to
-system fonts offline). Everything runs in the browser.
+Open `index.html`. No build, no dependencies, no network — fonts are bundled
+locally with the suite. Everything runs in the browser.
 
 ## What's inside
 

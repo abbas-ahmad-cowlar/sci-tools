@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Soliton Lab — Sci-Tools</title>
+<style data-inlined="lab.css">
+/* ============================================================
+   THE MIDNIGHT LAB — shared design system
+   "Aurora over a midnight sea" — dark, luminous, scientific.
+   Fully self-contained: system fonts only, no external assets.
+   ============================================================ */
+
+:root {
+  /* Base surfaces */
+  --bg-0: #05060c;     /* deepest background */
+  --bg-1: #090b14;     /* panel base */
+  --bg-2: #0e1120;     /* raised panel */
+  --bg-3: #151a2e;     /* hover / active */
+  --line: rgba(150, 170, 230, 0.10);
+  --line-strong: rgba(150, 170, 230, 0.22);
+
+  /* Text */
+  --ink: #e8ecf8;
+  --ink-dim: #aab3cf;
+  --ink-faint: #6b748f;
+
+  /* Aurora accents */
+  --aurora-teal:  #4fd1c5;
+  --aurora-cyan:  #38bdf8;
+  --aurora-violet:#a78bfa;
+  --aurora-pink:  #f472b6;
+  --aurora-amber: #fbbf24;
+  --aurora-lime:  #a3e635;
+
+  --accent: var(--aurora-cyan);
+  --accent-2: var(--aurora-violet);
+
+  /* Effects */
+  --glow: 0 0 24px;
+  --radius: 16px;
+  --radius-sm: 10px;
+  --shadow: 0 18px 50px -18px rgba(0, 0, 0, 0.8);
+
+  --mono: ui-monospace, "Cascadia Code", "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace;
+  --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+}
+
+body {
+  font-family: var(--sans);
+  color: var(--ink);
+  background:
+    radial-gradient(1200px 700px at 12% -10%, rgba(79, 209, 197, 0.10), transparent 60%),
+    radial-gradient(1100px 800px at 100% 0%, rgba(167, 139, 250, 0.12), transparent 55%),
+    radial-gradient(900px 700px at 50% 120%, rgba(56, 189, 248, 0.08), transparent 60%),
+    var(--bg-0);
+  background-attachment: fixed;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  letter-spacing: 0.1px;
+}
+
+::selection { background: rgba(56, 189, 248, 0.30); color: #fff; }
+
+a { color: var(--accent); text-decoration: none; }
+a:hover { color: #fff; }
+
+/* ---- Top bar (shared chrome across experiments) ---- */
+.lab-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 22px;
+  background: linear-gradient(180deg, rgba(9, 11, 20, 0.92), rgba(9, 11, 20, 0.55));
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--line);
+}
+.lab-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-dim);
+  padding: 7px 13px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.02);
+  transition: all 0.18s ease;
+}
+.lab-back:hover {
+  color: #fff;
+  border-color: var(--line-strong);
+  background: rgba(56, 189, 248, 0.10);
+  transform: translateX(-2px);
+}
+.lab-title {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+.lab-title .dim { color: var(--ink-faint); font-weight: 500; }
+.lab-note { font-size: 12px; color: var(--ink-faint); font-style: italic; }
+.lab-note b { color: var(--ink-dim); font-style: normal; font-weight: 600; }
+@media (max-width: 820px) { .lab-note { display: none; } }
+.lab-spacer { flex: 1; }
+.lab-tag {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink-faint);
+  padding: 5px 11px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+/* ---- Control panel / glass cards ---- */
+.panel {
+  background: linear-gradient(180deg, rgba(20, 26, 46, 0.55), rgba(10, 13, 24, 0.65));
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+.panel-pad { padding: 18px; }
+
+.panel h3, .panel-title {
+  margin: 0 0 14px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+/* ---- Form controls ---- */
+.field { margin-bottom: 16px; }
+.field:last-child { margin-bottom: 0; }
+.field label {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 12.5px;
+  color: var(--ink-dim);
+  margin-bottom: 7px;
+  font-weight: 500;
+}
+.field label .val {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  outline: none;
+  cursor: pointer;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  border: 3px solid var(--accent);
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.7);
+  cursor: pointer;
+  transition: transform 0.12s ease;
+}
+input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.18); }
+input[type="range"]::-moz-range-thumb {
+  width: 16px; height: 16px; border-radius: 50%;
+  background: #fff; border: 3px solid var(--accent);
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.7); cursor: pointer;
+}
+
+select, input[type="text"], input[type="number"] {
+  width: 100%;
+  padding: 9px 12px;
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+select:focus, input[type="text"]:focus, input[type="number"]:focus {
+  border-color: var(--accent);
+}
+
+/* ---- Buttons ---- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 16px;
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.16s ease;
+  user-select: none;
+}
+.btn:hover { background: var(--bg-3); border-color: var(--line-strong); transform: translateY(-1px); }
+.btn:active { transform: translateY(0); }
+.btn.primary {
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  border: none;
+  color: #04101c;
+  font-weight: 700;
+}
+.btn.primary:hover { box-shadow: 0 8px 24px -6px rgba(56, 189, 248, 0.55); }
+.btn-row { display: flex; gap: 10px; flex-wrap: wrap; }
+
+.chip {
+  font-family: var(--mono);
+  font-size: 11px;
+  padding: 6px 11px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--ink-dim);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.chip:hover { border-color: var(--line-strong); color: #fff; }
+.chip.active {
+  background: rgba(56, 189, 248, 0.14);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+/* ---- Readout / stats ---- */
+.readout {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--ink-dim);
+  display: flex;
+  justify-content: space-between;
+  padding: 5px 0;
+  border-bottom: 1px dashed var(--line);
+}
+.readout:last-child { border-bottom: none; }
+.readout b { color: var(--accent); font-weight: 600; }
+
+.hint { font-size: 12px; color: var(--ink-faint); line-height: 1.6; }
+
+/* ---- Canvas frame ---- */
+canvas { display: block; }
+.stage {
+  position: relative;
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: #000;
+}
+
+/* ---- scrollbars ---- */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(150,170,230,0.16); border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(150,170,230,0.30); }
+
+/* ---- utility ---- */
+.kbd {
+  font-family: var(--mono);
+  font-size: 11px;
+  padding: 2px 7px;
+  border-radius: 6px;
+  border: 1px solid var(--line-strong);
+  background: var(--bg-2);
+  color: var(--ink-dim);
+}
+.grow { flex: 1; }
+.muted { color: var(--ink-faint); }
+</style>
+<style>
+  html, body { height: 100%; overflow: hidden; }
+  .wrap {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 16px;
+    height: calc(100vh - 57px);
+    padding: 16px;
+  }
+  .side { overflow-y: auto; padding-right: 4px; display: flex; flex-direction: column; gap: 16px; }
+  .main {
+    display: grid;
+    grid-template-rows: 1fr 230px;
+    gap: 16px;
+    min-width: 0;
+    min-height: 0;
+  }
+  .stage { display: flex; flex-direction: column; min-height: 0; }
+  .stage-label {
+    position: absolute; top: 10px; left: 14px; z-index: 5;
+    font-family: var(--mono); font-size: 11px; letter-spacing: 0.5px;
+    color: var(--ink-dim); text-transform: uppercase;
+    background: rgba(5,6,12,0.55); padding: 4px 9px; border-radius: 8px;
+    border: 1px solid var(--line);
+  }
+  .stage-axis {
+    position: absolute; font-family: var(--mono); font-size: 10px; color: var(--ink-faint);
+    pointer-events: none;
+  }
+  canvas { width: 100%; height: 100%; }
+  .preset-grid { display: flex; flex-wrap: wrap; gap: 7px; }
+  .seg { display: flex; gap: 0; border: 1px solid var(--line); border-radius: var(--radius-sm); overflow: hidden; }
+  .seg button {
+    flex: 1; padding: 8px 6px; background: var(--bg-2); border: none; color: var(--ink-dim);
+    font-size: 12px; font-weight: 600; cursor: pointer; font-family: var(--sans);
+    transition: all 0.15s ease;
+  }
+  .seg button + button { border-left: 1px solid var(--line); }
+  .seg button.active { background: rgba(56,189,248,0.16); color: #fff; }
+  .eqn {
+    font-family: var(--mono); font-size: 12px; color: var(--ink-dim);
+    text-align: center; padding: 10px; line-height: 1.7;
+    background: var(--bg-1); border: 1px solid var(--line); border-radius: var(--radius-sm);
+  }
+  .eqn b { color: var(--aurora-violet); }
+  .small-canvas-frame { position: relative; }
+</style>
+</head>
+<body>
+
+<div class="lab-topbar">
+  <a class="lab-back" href="../../index.html">◀ Sci-Tools</a>
+  <div class="lab-title">Soliton Lab <span class="dim">/ nonlinear Schrödinger · split-step Fourier</span></div>
+  <div class="lab-note">↳ the split-step NLSE solver behind my <b>nonlinear fiber-optics &amp; pulse-propagation</b> work</div>
+  <div class="lab-spacer"></div>
+  <div class="lab-tag">i u<sub>ξ</sub> + ½ u<sub>ττ</sub> + |u|²u = 0</div>
+</div>
+
+<div class="wrap">
+  <!-- ============ CONTROLS ============ -->
+  <div class="side">
+    <div class="panel panel-pad">
+      <h3>Initial Field</h3>
+      <div class="field">
+        <label><span>Pulse shape</span></label>
+        <select id="shape">
+          <option value="sech">Soliton — N·sech(τ)</option>
+          <option value="gauss">Gaussian — exp(−τ²/2)</option>
+          <option value="collide">Two-soliton collision</option>
+          <option value="mi">CW + noise (mod. instability)</option>
+          <option value="pair">Soliton + soliton (bound)</option>
+        </select>
+      </div>
+      <div class="field" id="orderField">
+        <label><span>Soliton order N (amplitude)</span><span class="val" id="orderVal">1.0</span></label>
+        <input type="range" id="order" min="0.4" max="4" step="0.1" value="1">
+      </div>
+      <div class="field">
+        <label><span>Pulse width T₀</span><span class="val" id="widthVal">1.0</span></label>
+        <input type="range" id="width" min="0.5" max="3" step="0.1" value="1">
+      </div>
+      <div class="field">
+        <label><span>Initial chirp C</span><span class="val" id="chirpVal">0.0</span></label>
+        <input type="range" id="chirp" min="-4" max="4" step="0.2" value="0">
+      </div>
+    </div>
+
+    <div class="panel panel-pad">
+      <h3>Medium</h3>
+      <div class="field">
+        <label><span>Dispersion regime</span></label>
+        <div class="seg" id="dispSeg">
+          <button data-s="1" class="active">Anomalous (β₂&lt;0)</button>
+          <button data-s="-1">Normal (β₂&gt;0)</button>
+        </div>
+      </div>
+      <div class="field">
+        <label><span>Nonlinearity γ</span><span class="val" id="gammaVal">1.00</span></label>
+        <input type="range" id="gamma" min="0" max="2" step="0.05" value="1">
+      </div>
+      <div class="field">
+        <label><span>Loss / gain α</span><span class="val" id="lossVal">0.000</span></label>
+        <input type="range" id="loss" min="-0.05" max="0.1" step="0.005" value="0">
+      </div>
+      <div class="field" style="margin-bottom:0">
+        <label><span>Step size dξ</span><span class="val" id="dzVal">0.005</span></label>
+        <input type="range" id="dz" min="0.001" max="0.02" step="0.001" value="0.005">
+      </div>
+    </div>
+
+    <div class="panel panel-pad">
+      <h3>Presets</h3>
+      <div class="preset-grid" id="presets">
+        <button class="chip" data-p="fundamental">Fundamental soliton</button>
+        <button class="chip" data-p="breather">N=3 breather</button>
+        <button class="chip" data-p="fission">Soliton fission</button>
+        <button class="chip" data-p="collision">Collision</button>
+        <button class="chip" data-p="mi">Mod. instability</button>
+        <button class="chip" data-p="dispersion">Pure dispersion</button>
+      </div>
+    </div>
+
+    <div class="panel panel-pad">
+      <h3>Diagnostics</h3>
+      <div class="readout"><span>Distance ξ</span><b id="rDist">0.000</b></div>
+      <div class="readout"><span>Peak power</span><b id="rPeak">1.000</b></div>
+      <div class="readout"><span>Temporal FWHM</span><b id="rFwhm">1.76</b></div>
+      <div class="readout"><span>Spectral FWHM</span><b id="rSpec">0.00</b></div>
+      <div class="readout"><span>Energy ∫|u|²dτ</span><b id="rEnergy">0.00</b></div>
+      <div class="readout"><span>Energy drift</span><b id="rDrift">0.0 ppm</b></div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn primary grow" id="playBtn">⏸ Pause</button>
+      <button class="btn" id="restartBtn">↺ Restart</button>
+    </div>
+
+    <p class="hint">
+      Watch a pulse propagate down a nonlinear fibre. A <b>fundamental soliton</b> (N=1) keeps its
+      shape forever — dispersion and self-phase-modulation cancel exactly. Higher orders
+      <b>breathe</b>; in normal dispersion the pulse just spreads. The energy drift readout is your
+      numerical conscience: split-step Fourier conserves it to ~ppm.
+    </p>
+  </div>
+
+  <!-- ============ DISPLAY ============ -->
+  <div class="main">
+    <div class="stage" style="position:relative;">
+      <div class="stage-label">Evolution &nbsp;|u(τ, ξ)|² &nbsp;— propagation distance increases downward</div>
+      <canvas id="waterfall"></canvas>
+    </div>
+    <div class="stage" style="position:relative;">
+      <div class="stage-label">Current profile — intensity (cyan) &amp; phase (violet) · spectrum (amber)</div>
+      <canvas id="profile"></canvas>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+/* =========================================================================
+   Nonlinear Schrödinger equation, dimensionless soliton units:
+        i ∂u/∂ξ + (s/2) ∂²u/∂τ² + γ|u|²u + i(α/2)u = 0
+   Solved by the symmetric split-step Fourier method:
+        linear half-step (in ω)  →  nonlinear full-step (in τ)  →  linear half-step
+   ========================================================================= */
+
+// ---------- iterative radix-2 FFT ----------
+function fft(re, im, inverse) {
+  const n = re.length;
+  for (let i = 1, j = 0; i < n; i++) {
+    let bit = n >> 1;
+    for (; j & bit; bit >>= 1) j ^= bit;
+    j ^= bit;
+    if (i < j) {
+      const tr = re[i]; re[i] = re[j]; re[j] = tr;
+      const ti = im[i]; im[i] = im[j]; im[j] = ti;
+    }
+  }
+  for (let len = 2; len <= n; len <<= 1) {
+    const ang = (inverse ? 2 : -2) * Math.PI / len;
+    const wr = Math.cos(ang), wi = Math.sin(ang);
+    const half = len >> 1;
+    for (let i = 0; i < n; i += len) {
+      let cwr = 1, cwi = 0;
+      for (let k = 0; k < half; k++) {
+        const a = i + k, b = a + half;
+        const tr = re[b] * cwr - im[b] * cwi;
+        const ti = re[b] * cwi + im[b] * cwr;
+        re[b] = re[a] - tr; im[b] = im[a] - ti;
+        re[a] += tr;        im[a] += ti;
+        const ncwr = cwr * wr - cwi * wi;
+        cwi = cwr * wi + cwi * wr; cwr = ncwr;
+      }
+    }
+  }
+  if (inverse) { for (let i = 0; i < n; i++) { re[i] /= n; im[i] /= n; } }
+}
+
+// ---------- grid ----------
+const N = 1024;
+const Twin = 51.2;                 // total τ window
+const dT = Twin / N;               // sample spacing
+const tau = new Float64Array(N);
+const omega = new Float64Array(N); // angular frequency for each FFT bin
+for (let i = 0; i < N; i++) {
+  tau[i] = -Twin / 2 + i * dT;
+  const m = (i < N / 2) ? i : i - N;
+  omega[i] = 2 * Math.PI * m / Twin;
+}
+
+// field buffers
+let ur = new Float64Array(N), ui = new Float64Array(N);
+// precomputed half-step dispersion phase
+let dispC = new Float64Array(N), dispS = new Float64Array(N);
+
+// parameters (live)
+const P = { shape: 'sech', N: 1, T0: 1, chirp: 0, s: 1, gamma: 1, loss: 0, dz: 0.005 };
+let xi = 0, E0 = 1, running = true;
+
+function buildDispersion() {
+  // linear half-step multiplier exp(-i (s/2) ω² (dz/2))
+  for (let i = 0; i < N; i++) {
+    const ph = -0.5 * P.s * omega[i] * omega[i] * (P.dz / 2);
+    dispC[i] = Math.cos(ph);
+    dispS[i] = Math.sin(ph);
+  }
+}
+
+function sech(x) { return 1 / Math.cosh(x); }
+
+function initField() {
+  xi = 0;
+  const A = P.N, T0 = P.T0, C = P.chirp;
+  for (let i = 0; i < N; i++) {
+    const t = tau[i];
+    let re = 0, im = 0, amp = 0;
+    switch (P.shape) {
+      case 'sech':  amp = A * sech(t / T0); break;
+      case 'gauss': amp = A * Math.exp(-0.5 * (t / T0) * (t / T0)); break;
+      case 'collide': {
+        // two solitons launched toward each other with opposite frequency shift
+        const sep = 8, kk = 1.6;
+        const a1 = sech((t + sep) / T0), a2 = sech((t - sep) / T0);
+        re = a1 * Math.cos(kk * t) + a2 * Math.cos(-kk * t);
+        im = a1 * Math.sin(kk * t) + a2 * Math.sin(-kk * t);
+        ur[i] = re; ui[i] = im; continue;
+      }
+      case 'pair': {
+        const sep = 3.5;
+        amp = sech((t + sep) / T0) + sech((t - sep) / T0);
+        break;
+      }
+      case 'mi': {
+        // continuous wave + weak broadband noise
+        const cw = 1.0;
+        const noise = 0.02 * (Math.random() - 0.5);
+        re = cw + noise; im = 0.02 * (Math.random() - 0.5);
+        ur[i] = re; ui[i] = im; continue;
+      }
+    }
+    // apply linear chirp exp(-i C t²/2)
+    const phase = -0.5 * C * t * t;
+    ur[i] = amp * Math.cos(phase);
+    ui[i] = amp * Math.sin(phase);
+  }
+  E0 = energy();
+}
+
+function energy() {
+  let e = 0;
+  for (let i = 0; i < N; i++) e += ur[i] * ur[i] + ui[i] * ui[i];
+  return e * dT;
+}
+
+// one symmetric split-step over dz
+function step() {
+  const dz = P.dz, g = P.gamma, al = P.loss;
+  // --- linear half step (frequency domain) ---
+  fft(ur, ui, false);
+  for (let i = 0; i < N; i++) {
+    const r = ur[i], im = ui[i];
+    ur[i] = r * dispC[i] - im * dispS[i];
+    ui[i] = r * dispS[i] + im * dispC[i];
+  }
+  fft(ur, ui, true);
+  // --- nonlinear full step (time domain): exp(i γ|u|² dz) and loss exp(-α dz/2) ---
+  const lossFac = Math.exp(-0.5 * al * dz);
+  for (let i = 0; i < N; i++) {
+    const I = ur[i] * ur[i] + ui[i] * ui[i];
+    const ph = g * I * dz;
+    const c = Math.cos(ph), sn = Math.sin(ph);
+    const r = ur[i], im = ui[i];
+    ur[i] = (r * c - im * sn) * lossFac;
+    ui[i] = (r * sn + im * c) * lossFac;
+  }
+  // --- linear half step ---
+  fft(ur, ui, false);
+  for (let i = 0; i < N; i++) {
+    const r = ur[i], im = ui[i];
+    ur[i] = r * dispC[i] - im * dispS[i];
+    ui[i] = r * dispS[i] + im * dispC[i];
+  }
+  fft(ur, ui, true);
+  xi += dz;
+}
+
+// ---------- colormap (inferno-ish aurora) ----------
+function colormap(t) {
+  t = Math.max(0, Math.min(1, t));
+  // smooth multi-stop gradient: black -> indigo -> magenta -> amber -> white
+  const stops = [
+    [4, 4, 14], [38, 18, 84], [120, 30, 140], [214, 60, 120],
+    [250, 140, 70], [255, 222, 150], [255, 255, 245]
+  ];
+  const x = t * (stops.length - 1);
+  const i = Math.min(stops.length - 2, Math.floor(x));
+  const f = x - i;
+  const a = stops[i], b = stops[i + 1];
+  return [
+    (a[0] + (b[0] - a[0]) * f) | 0,
+    (a[1] + (b[1] - a[1]) * f) | 0,
+    (a[2] + (b[2] - a[2]) * f) | 0
+  ];
+}
+
+// ---------- waterfall ----------
+const ROWS = 480;
+const wf = document.getElementById('waterfall');
+const wfx = wf.getContext('2d');
+const wfImg = new ImageData(N, ROWS);
+let wfRow = 0, wfFilled = 0;
+let peakScale = 1;
+
+function pushRow() {
+  // intensity
+  let pk = 0;
+  const inten = new Float64Array(N);
+  for (let i = 0; i < N; i++) { const I = ur[i] * ur[i] + ui[i] * ui[i]; inten[i] = I; if (I > pk) pk = I; }
+  // adaptive but smoothed peak scale
+  peakScale = peakScale * 0.95 + Math.max(pk, 0.05) * 0.05;
+  const sc = 1 / Math.max(peakScale, pk * 0.6, 0.05);
+  const off = wfRow * N * 4;
+  const d = wfImg.data;
+  for (let i = 0; i < N; i++) {
+    const c = colormap(Math.sqrt(inten[i] * sc)); // sqrt for visual gamma
+    const p = off + i * 4;
+    d[p] = c[0]; d[p + 1] = c[1]; d[p + 2] = c[2]; d[p + 3] = 255;
+  }
+  wfRow = (wfRow + 1) % ROWS;
+  if (wfFilled < ROWS) wfFilled++;
+}
+
+function drawWaterfall() {
+  // unroll circular buffer so newest row is at bottom
+  const tmp = new ImageData(N, ROWS);
+  const src = wfImg.data, dst = tmp.data;
+  for (let r = 0; r < ROWS; r++) {
+    const srcRow = (wfRow + r) % ROWS;        // oldest first
+    const so = srcRow * N * 4, doff = r * N * 4;
+    dst.set(src.subarray(so, so + N * 4), doff);
+  }
+  // blit scaled to canvas
+  const w = wf.width, h = wf.height;
+  // use an offscreen to scale
+  off1.width = N; off1.height = ROWS;
+  off1ctx.putImageData(tmp, 0, 0);
+  wfx.imageSmoothingEnabled = true;
+  wfx.clearRect(0, 0, w, h);
+  wfx.drawImage(off1, 0, 0, N, ROWS, 0, 0, w, h);
+}
+
+const off1 = document.createElement('canvas');
+const off1ctx = off1.getContext('2d');
+
+// ---------- profile plot ----------
+const pf = document.getElementById('profile');
+const pfx = pf.getContext('2d');
+
+function drawProfile() {
+  const w = pf.width, h = pf.height, pad = 26;
+  pfx.clearRect(0, 0, w, h);
+  // intensity & phase
+  let pk = 0;
+  for (let i = 0; i < N; i++) { const I = ur[i] * ur[i] + ui[i] * ui[i]; if (I > pk) pk = I; }
+  pk = Math.max(pk, 1e-3);
+  const x0 = pad, x1 = w - pad, y0 = h - pad, y1 = pad;
+  const X = i => x0 + (i / (N - 1)) * (x1 - x0);
+  // grid
+  pfx.strokeStyle = 'rgba(150,170,230,0.08)'; pfx.lineWidth = 1;
+  for (let g = 0; g <= 4; g++) {
+    const yy = y1 + (y0 - y1) * g / 4;
+    pfx.beginPath(); pfx.moveTo(x0, yy); pfx.lineTo(x1, yy); pfx.stroke();
+  }
+  // intensity fill
+  pfx.beginPath();
+  pfx.moveTo(x0, y0);
+  for (let i = 0; i < N; i++) {
+    const I = (ur[i] * ur[i] + ui[i] * ui[i]) / pk;
+    pfx.lineTo(X(i), y0 - I * (y0 - y1));
+  }
+  pfx.lineTo(x1, y0); pfx.closePath();
+  const grad = pfx.createLinearGradient(0, y1, 0, y0);
+  grad.addColorStop(0, 'rgba(79,209,197,0.55)');
+  grad.addColorStop(1, 'rgba(79,209,197,0.02)');
+  pfx.fillStyle = grad; pfx.fill();
+  pfx.strokeStyle = '#4fd1c5'; pfx.lineWidth = 1.6; pfx.shadowColor = '#4fd1c5'; pfx.shadowBlur = 8;
+  pfx.beginPath();
+  for (let i = 0; i < N; i++) {
+    const I = (ur[i] * ur[i] + ui[i] * ui[i]) / pk;
+    if (i === 0) pfx.moveTo(X(i), y0 - I * (y0 - y1)); else pfx.lineTo(X(i), y0 - I * (y0 - y1));
+  }
+  pfx.stroke(); pfx.shadowBlur = 0;
+  // phase (only where intensity is non-negligible)
+  pfx.strokeStyle = 'rgba(167,139,250,0.7)'; pfx.lineWidth = 1.2;
+  pfx.beginPath(); let started = false;
+  for (let i = 0; i < N; i++) {
+    const I = ur[i] * ur[i] + ui[i] * ui[i];
+    if (I < pk * 0.02) { started = false; continue; }
+    const phi = Math.atan2(ui[i], ur[i]); // -π..π
+    const yy = y0 - ((phi + Math.PI) / (2 * Math.PI)) * (y0 - y1);
+    if (!started) { pfx.moveTo(X(i), yy); started = true; } else pfx.lineTo(X(i), yy);
+  }
+  pfx.stroke();
+  // spectrum (amber), overlaid on right-reading axis, computed via FFT of a copy
+  const sr = Float64Array.from(ur), si = Float64Array.from(ui);
+  fft(sr, si, false);
+  // arrange spectrum centered (fftshift)
+  let spk = 0; const spec = new Float64Array(N);
+  for (let i = 0; i < N; i++) { const S = sr[i] * sr[i] + si[i] * si[i]; spec[i] = S; if (S > spk) spk = S; }
+  spk = Math.max(spk, 1e-6);
+  pfx.strokeStyle = 'rgba(251,191,36,0.65)'; pfx.lineWidth = 1.2;
+  pfx.beginPath();
+  let first = true;
+  for (let k = 0; k < N; k++) {
+    const idx = (k + N / 2) % N;             // fftshift index
+    const S = spec[idx] / spk;
+    const xx = x0 + (k / (N - 1)) * (x1 - x0);
+    const yy = y0 - S * (y0 - y1) * 0.92;
+    if (first) { pfx.moveTo(xx, yy); first = false; } else pfx.lineTo(xx, yy);
+  }
+  pfx.stroke();
+  // axis hint
+  pfx.fillStyle = 'rgba(107,116,143,0.9)'; pfx.font = '10px ui-monospace, monospace';
+  pfx.fillText('τ →', x1 - 22, y0 + 16);
+  pfx.fillText('0', (x0 + x1) / 2 - 3, y0 + 16);
+}
+
+// ---------- diagnostics ----------
+function fwhm(arr) {
+  let pk = 0, pki = 0;
+  for (let i = 0; i < N; i++) if (arr[i] > pk) { pk = arr[i]; pki = i; }
+  const half = pk / 2;
+  let l = pki, r = pki;
+  while (l > 0 && arr[l] > half) l--;
+  while (r < N - 1 && arr[r] > half) r++;
+  return (r - l);
+}
+
+function updateDiagnostics() {
+  const inten = new Float64Array(N);
+  let pk = 0;
+  for (let i = 0; i < N; i++) { inten[i] = ur[i] * ur[i] + ui[i] * ui[i]; if (inten[i] > pk) pk = inten[i]; }
+  const fw = fwhm(inten) * dT;
+  // spectral
+  const sr = Float64Array.from(ur), si = Float64Array.from(ui);
+  fft(sr, si, false);
+  const spec = new Float64Array(N);
+  for (let i = 0; i < N; i++) spec[i] = sr[i] * sr[i] + si[i] * si[i];
+  // spectral fwhm in ω (bins are spaced 2π/Twin)
+  const specShift = new Float64Array(N);
+  for (let k = 0; k < N; k++) specShift[k] = spec[(k + N / 2) % N];
+  const sfw = fwhm(specShift) * (2 * Math.PI / Twin);
+  const E = energy();
+  document.getElementById('rDist').textContent = xi.toFixed(3);
+  document.getElementById('rPeak').textContent = pk.toFixed(3);
+  document.getElementById('rFwhm').textContent = fw.toFixed(2);
+  document.getElementById('rSpec').textContent = sfw.toFixed(2);
+  document.getElementById('rEnergy').textContent = E.toFixed(3);
+  const drift = E0 > 0 ? ((E - E0) / E0) * 1e6 : 0;
+  document.getElementById('rDrift').textContent = (drift >= 0 ? '+' : '') + drift.toFixed(1) + ' ppm';
+}
+
+// ---------- main loop ----------
+let diagCounter = 0;
+function frame() {
+  if (running) {
+    const stepsPerFrame = 6;
+    for (let k = 0; k < stepsPerFrame; k++) { step(); pushRow(); }
+    drawWaterfall();
+    drawProfile();
+    if ((diagCounter++ % 3) === 0) updateDiagnostics();
+  }
+  requestAnimationFrame(frame);
+}
+
+// ---------- sizing ----------
+function resize() {
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  for (const c of [wf, pf]) {
+    const r = c.getBoundingClientRect();
+    c.width = Math.max(2, r.width * dpr | 0);
+    c.height = Math.max(2, r.height * dpr | 0);
+  }
+}
+window.addEventListener('resize', resize);
+
+// ---------- UI wiring ----------
+function bindSlider(id, valId, fmt, key, after) {
+  const el = document.getElementById(id), v = document.getElementById(valId);
+  const upd = () => {
+    P[key] = parseFloat(el.value);
+    v.textContent = fmt(P[key]);
+    if (after) after();
+  };
+  el.addEventListener('input', upd); upd();
+}
+bindSlider('order', 'orderVal', x => x.toFixed(1), 'N');
+bindSlider('width', 'widthVal', x => x.toFixed(1), 'T0');
+bindSlider('chirp', 'chirpVal', x => x.toFixed(1), 'chirp');
+bindSlider('gamma', 'gammaVal', x => x.toFixed(2), 'gamma');
+bindSlider('loss', 'lossVal', x => x.toFixed(3), 'loss');
+bindSlider('dz', 'dzVal', x => x.toFixed(3), 'dz', buildDispersion);
+
+document.getElementById('shape').addEventListener('change', e => {
+  P.shape = e.target.value;
+  document.getElementById('orderField').style.display =
+    (P.shape === 'mi' || P.shape === 'collide') ? 'none' : '';
+  restart();
+});
+
+document.querySelectorAll('#dispSeg button').forEach(b => {
+  b.addEventListener('click', () => {
+    document.querySelectorAll('#dispSeg button').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    P.s = parseFloat(b.dataset.s);
+    buildDispersion();
+  });
+});
+
+function clearWaterfall() { wfRow = 0; wfFilled = 0; peakScale = 1; wfImg.data.fill(0); }
+function restart() { buildDispersion(); initField(); clearWaterfall(); }
+
+document.getElementById('restartBtn').addEventListener('click', restart);
+const playBtn = document.getElementById('playBtn');
+playBtn.addEventListener('click', () => {
+  running = !running;
+  playBtn.textContent = running ? '⏸ Pause' : '▶ Play';
+});
+
+// presets
+const PRESETS = {
+  fundamental: { shape: 'sech', N: 1, T0: 1, chirp: 0, s: 1, gamma: 1, loss: 0 },
+  breather:    { shape: 'sech', N: 3, T0: 1, chirp: 0, s: 1, gamma: 1, loss: 0 },
+  fission:     { shape: 'sech', N: 3.5, T0: 1, chirp: 0, s: 1, gamma: 1, loss: 0.02 },
+  collision:   { shape: 'collide', T0: 1, chirp: 0, s: 1, gamma: 1, loss: 0 },
+  mi:          { shape: 'mi', s: 1, gamma: 1, loss: 0 },
+  dispersion:  { shape: 'gauss', N: 1, T0: 1, chirp: 0, s: -1, gamma: 0, loss: 0 }
+};
+document.querySelectorAll('#presets .chip').forEach(c => {
+  c.addEventListener('click', () => {
+    const pr = PRESETS[c.dataset.p];
+    Object.assign(P, pr);
+    // reflect into UI
+    document.getElementById('shape').value = P.shape;
+    document.getElementById('orderField').style.display =
+      (P.shape === 'mi' || P.shape === 'collide') ? 'none' : '';
+    const set = (id, val, fmt, vid) => { const e = document.getElementById(id); if (val !== undefined) { e.value = val; document.getElementById(vid).textContent = fmt(val); } };
+    set('order', P.N, x => (+x).toFixed(1), 'orderVal');
+    set('width', P.T0, x => (+x).toFixed(1), 'widthVal');
+    set('chirp', P.chirp, x => (+x).toFixed(1), 'chirpVal');
+    set('gamma', P.gamma, x => (+x).toFixed(2), 'gammaVal');
+    set('loss', P.loss, x => (+x).toFixed(3), 'lossVal');
+    document.querySelectorAll('#dispSeg button').forEach(x =>
+      x.classList.toggle('active', parseFloat(x.dataset.s) === P.s));
+    restart();
+    document.querySelectorAll('#presets .chip').forEach(x => x.classList.remove('active'));
+    c.classList.add('active');
+  });
+});
+
+// boot
+resize();
+restart();
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Propagate — uncertainty &amp; error-budget calculator</title>
+<meta name="description" content="Offline first-order uncertainty propagation calculator with an error budget: see which measurement dominates your result's error." />
+<style>
+:root{
+  --bg:#0e1116; --bg2:#141922; --card:#171c26; --line:#252c39;
+  --ink:#e8edf6; --dim:#9aa6bb; --faint:#5f6b80;
+  --accent:#5ad0a8; --accent2:#6aa8ff; --warn:#ff6b6b; --amber:#ffb454;
+  --mono:"JetBrains Mono","SF Mono","Cascadia Code",ui-monospace,monospace;
+  --sans:"Inter","Segoe UI",system-ui,-apple-system,sans-serif;
+  --r:12px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:var(--sans); color:var(--ink);
+  background:radial-gradient(130% 100% at 80% -10%,#16202c 0%,var(--bg) 55%);
+  min-height:100vh; line-height:1.5; -webkit-font-smoothing:antialiased;
+}
+a{color:var(--accent2);text-decoration:none}
+.wrap{max-width:1080px;margin:0 auto;padding:30px 22px 60px}
+
+/* header */
+header{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:24px;flex-wrap:wrap}
+.brand h1{font-size:23px;font-weight:700;letter-spacing:-.01em;display:flex;align-items:center;gap:11px}
+.sigma{display:inline-grid;place-items:center;width:34px;height:34px;border-radius:9px;
+  background:linear-gradient(150deg,var(--accent),var(--accent2));color:#06121d;font-family:var(--mono);font-weight:700;font-size:19px}
+.brand p{color:var(--dim);font-size:13px;margin-top:5px;margin-left:45px}
+.head-actions{display:flex;gap:9px;align-items:center}
+.btn{font-family:var(--sans);font-size:12.5px;color:var(--ink);background:var(--card);border:1px solid var(--line);
+  border-radius:9px;padding:8px 13px;cursor:pointer;transition:.15s}
+.btn:hover{border-color:var(--accent);color:#fff}
+.btn.ghost{background:transparent}
+select.btn{appearance:none;padding-right:28px;background-image:linear-gradient(45deg,transparent 50%,var(--dim) 50%),linear-gradient(135deg,var(--dim) 50%,transparent 50%);
+  background-position:calc(100% - 15px) 16px,calc(100% - 10px) 16px;background-size:5px 5px;background-repeat:no-repeat}
+
+/* expression */
+.expr-card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;margin-bottom:18px}
+.expr-card label{display:block;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin-bottom:9px}
+.expr-row{display:flex;align-items:center;gap:12px}
+.fx{font-family:var(--mono);color:var(--accent);font-size:20px;font-style:italic}
+#expr{flex:1;font-family:var(--mono);font-size:19px;color:var(--ink);background:var(--bg2);
+  border:1px solid var(--line);border-radius:9px;padding:11px 14px;outline:none;transition:.15s}
+#expr:focus{border-color:var(--accent)}
+#expr.err{border-color:var(--warn)}
+.expr-msg{min-height:17px;font-family:var(--mono);font-size:12px;color:var(--warn);margin-top:9px;margin-left:30px}
+.expr-msg.okmsg{color:var(--faint)}
+
+/* layout */
+.cols{display:grid;grid-template-columns:1fr 0.92fr;gap:18px;align-items:start}
+@media(max-width:840px){.cols{grid-template-columns:1fr}}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.panel-h{padding:13px 18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+.panel-h h2{font-size:13px;letter-spacing:.04em;color:var(--dim);font-weight:600;text-transform:uppercase}
+.panel-h .hint{font-size:11px;color:var(--faint)}
+
+/* variables table */
+.vtable{width:100%;border-collapse:collapse;font-size:13.5px}
+.vtable th{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);font-weight:600;text-align:left;padding:10px 10px 8px}
+.vtable th.num,.vtable td.num{text-align:right}
+.vtable td{padding:5px 10px;border-top:1px solid var(--line)}
+.vname{font-family:var(--mono);color:var(--accent);font-size:15px}
+.vin{font-family:var(--mono);font-size:14px;width:100%;background:var(--bg2);border:1px solid transparent;border-radius:7px;
+  padding:7px 9px;color:var(--ink);outline:none;text-align:right;transition:.12s}
+.vin:focus{border-color:var(--accent2);background:#10151d}
+.vin.unit{text-align:left;color:var(--dim);width:64px}
+.pm{color:var(--faint);font-family:var(--mono);padding:0 2px}
+.empty{padding:26px 18px;color:var(--faint);font-size:13px;text-align:center}
+
+/* result */
+.result-main{padding:20px 18px;text-align:center;border-bottom:1px solid var(--line)}
+.result-val{font-family:var(--mono);font-size:30px;font-weight:600;letter-spacing:-.01em;line-height:1.15;word-break:break-word}
+.result-val .pm{color:var(--accent);font-size:24px}
+.result-val .unit{color:var(--dim);font-size:20px;margin-left:8px}
+.result-sub{margin-top:9px;font-size:12.5px;color:var(--dim);font-family:var(--mono);display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+.result-sub b{color:var(--amber);font-weight:600}
+
+/* budget */
+.budget{padding:14px 18px 18px}
+.budget-empty{color:var(--faint);font-size:12.5px;padding:8px 0}
+.brow{margin:11px 0}
+.brow-top{display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:5px}
+.brow-name{font-family:var(--mono);color:var(--ink)}
+.brow-name small{color:var(--faint);margin-left:6px}
+.brow-pct{font-family:var(--mono);color:var(--dim)}
+.bar{height:8px;border-radius:6px;background:var(--bg2);overflow:hidden}
+.bar i{display:block;height:100%;border-radius:6px;transition:width .25s ease}
+.brow-foot{font-size:11px;color:var(--faint);font-family:var(--mono);margin-top:4px}
+
+/* footer note / about */
+.about{margin-top:22px;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px 20px}
+.about h3{font-size:13px;color:var(--dim);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px}
+.about p{color:var(--dim);font-size:13px;margin-bottom:9px}
+.about code,.eq{font-family:var(--mono);color:var(--accent)}
+.eq{display:block;background:var(--bg2);border-left:2px solid var(--accent);padding:9px 13px;border-radius:6px;margin:10px 0;font-size:12.5px;color:var(--ink);white-space:pre-wrap}
+.about em{color:var(--accent2);font-style:normal}
+kbd{font-family:var(--mono);font-size:11px;background:var(--bg2);border:1px solid var(--line);border-radius:5px;padding:1px 6px;color:var(--dim)}
+.foot{margin-top:26px;text-align:center;color:var(--faint);font-size:11.5px}
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--card);border:1px solid var(--accent);
+  border-radius:9px;padding:9px 16px;font-size:12.5px;opacity:0;pointer-events:none;transition:.25s}
+.toast.show{opacity:1}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <h1><span class="sigma">σ</span>Propagate</h1>
+      <p>First-order uncertainty propagation &amp; error budget — fully offline.</p>
+    </div>
+    <div class="head-actions">
+      <select class="btn" id="examples" title="Load an example"><option value="">Examples…</option></select>
+      <label class="btn ghost" style="display:flex;gap:7px;align-items:center;cursor:pointer">sig figs
+        <select id="sig" style="background:transparent;border:none;color:var(--ink);font-family:var(--mono);outline:none;cursor:pointer">
+          <option>1</option><option selected>2</option><option>3</option>
+        </select>
+      </label>
+      <button class="btn" id="copy" title="Copy result">Copy</button>
+    </div>
+  </header>
+
+  <div class="expr-card">
+    <label>Expression</label>
+    <div class="expr-row">
+      <span class="fx">f =</span>
+      <input id="expr" spellcheck="false" autocomplete="off" value="I^2 * R" />
+    </div>
+    <div class="expr-msg okmsg" id="msg"></div>
+  </div>
+
+  <div class="cols">
+    <div class="panel">
+      <div class="panel-h"><h2>Measured quantities</h2><span class="hint">value &amp; ±1σ uncertainty</span></div>
+      <div id="vars-wrap">
+        <table class="vtable">
+          <thead><tr><th>Variable</th><th class="num">Value</th><th class="num">± Uncertainty</th><th>Unit</th></tr></thead>
+          <tbody id="vars"></tbody>
+        </table>
+        <div class="empty" id="vars-empty" style="display:none">Type an expression with variables above.</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-h"><h2>Result</h2><span class="hint" id="rel-hint"></span></div>
+      <div class="result-main">
+        <div class="result-val" id="rval">—</div>
+        <div class="result-sub" id="rsub"></div>
+      </div>
+      <div class="budget">
+        <div class="panel-h" style="padding:0 0 6px;border:none"><h2 style="font-size:12px">Error budget</h2><span class="hint">share of variance</span></div>
+        <div id="budget"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="about">
+    <h3>How it works</h3>
+    <p>Each measured quantity carries a standard uncertainty (±1σ). Assuming the inputs are
+    <em>independent</em>, the uncertainty of <code>f</code> is the root-sum-square of each variable's
+    contribution — the classic first-order propagation law:</p>
+    <span class="eq">σ_f = √( Σ (∂f/∂xᵢ · σᵢ)² )</span>
+    <p>The partial slopes are found numerically with a symmetric difference at ±σ (exact for linear and
+    quadratic forms, accurate otherwise — no symbolic differentiation, no <code>eval</code>). The
+    <em>error budget</em> ranks each term's share of the total variance, so you can see at a glance
+    <b>which measurement to improve first.</b> Math constants <code>pi, tau</code> are built in; physical
+    constants (<code>c, h, hbar, kB, NA, qe, eps0, mu0, me, g</code>) auto-fill as <em>editable</em> rows —
+    so you can give a measured <code>g</code> its own uncertainty, or override <code>c</code>.
+    Functions: <code>sqrt, exp, ln, log10, sin, cos, tan, atan2, sinh…, pow, hypot</code> and more.</p>
+    <p style="color:var(--faint)">Tip: press <kbd>Tab</kbd> through the value fields; everything recomputes live.</p>
+  </div>
+
+  <div class="foot">Propagate · runs entirely in your browser, no network, no data leaves the page.</div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script src="propagate.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

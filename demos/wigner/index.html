@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quantum Optics — Sci-Tools</title>
+<style data-inlined="lab.css">
+/* ============================================================
+   THE MIDNIGHT LAB — shared design system
+   "Aurora over a midnight sea" — dark, luminous, scientific.
+   Fully self-contained: system fonts only, no external assets.
+   ============================================================ */
+
+:root {
+  /* Base surfaces */
+  --bg-0: #05060c;     /* deepest background */
+  --bg-1: #090b14;     /* panel base */
+  --bg-2: #0e1120;     /* raised panel */
+  --bg-3: #151a2e;     /* hover / active */
+  --line: rgba(150, 170, 230, 0.10);
+  --line-strong: rgba(150, 170, 230, 0.22);
+
+  /* Text */
+  --ink: #e8ecf8;
+  --ink-dim: #aab3cf;
+  --ink-faint: #6b748f;
+
+  /* Aurora accents */
+  --aurora-teal:  #4fd1c5;
+  --aurora-cyan:  #38bdf8;
+  --aurora-violet:#a78bfa;
+  --aurora-pink:  #f472b6;
+  --aurora-amber: #fbbf24;
+  --aurora-lime:  #a3e635;
+
+  --accent: var(--aurora-cyan);
+  --accent-2: var(--aurora-violet);
+
+  /* Effects */
+  --glow: 0 0 24px;
+  --radius: 16px;
+  --radius-sm: 10px;
+  --shadow: 0 18px 50px -18px rgba(0, 0, 0, 0.8);
+
+  --mono: ui-monospace, "Cascadia Code", "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace;
+  --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+}
+
+body {
+  font-family: var(--sans);
+  color: var(--ink);
+  background:
+    radial-gradient(1200px 700px at 12% -10%, rgba(79, 209, 197, 0.10), transparent 60%),
+    radial-gradient(1100px 800px at 100% 0%, rgba(167, 139, 250, 0.12), transparent 55%),
+    radial-gradient(900px 700px at 50% 120%, rgba(56, 189, 248, 0.08), transparent 60%),
+    var(--bg-0);
+  background-attachment: fixed;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  letter-spacing: 0.1px;
+}
+
+::selection { background: rgba(56, 189, 248, 0.30); color: #fff; }
+
+a { color: var(--accent); text-decoration: none; }
+a:hover { color: #fff; }
+
+/* ---- Top bar (shared chrome across experiments) ---- */
+.lab-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 22px;
+  background: linear-gradient(180deg, rgba(9, 11, 20, 0.92), rgba(9, 11, 20, 0.55));
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--line);
+}
+.lab-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-dim);
+  padding: 7px 13px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.02);
+  transition: all 0.18s ease;
+}
+.lab-back:hover {
+  color: #fff;
+  border-color: var(--line-strong);
+  background: rgba(56, 189, 248, 0.10);
+  transform: translateX(-2px);
+}
+.lab-title {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+.lab-title .dim { color: var(--ink-faint); font-weight: 500; }
+.lab-note { font-size: 12px; color: var(--ink-faint); font-style: italic; }
+.lab-note b { color: var(--ink-dim); font-style: normal; font-weight: 600; }
+@media (max-width: 820px) { .lab-note { display: none; } }
+.lab-spacer { flex: 1; }
+.lab-tag {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink-faint);
+  padding: 5px 11px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+/* ---- Control panel / glass cards ---- */
+.panel {
+  background: linear-gradient(180deg, rgba(20, 26, 46, 0.55), rgba(10, 13, 24, 0.65));
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+.panel-pad { padding: 18px; }
+
+.panel h3, .panel-title {
+  margin: 0 0 14px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+/* ---- Form controls ---- */
+.field { margin-bottom: 16px; }
+.field:last-child { margin-bottom: 0; }
+.field label {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 12.5px;
+  color: var(--ink-dim);
+  margin-bottom: 7px;
+  font-weight: 500;
+}
+.field label .val {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  outline: none;
+  cursor: pointer;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  border: 3px solid var(--accent);
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.7);
+  cursor: pointer;
+  transition: transform 0.12s ease;
+}
+input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.18); }
+input[type="range"]::-moz-range-thumb {
+  width: 16px; height: 16px; border-radius: 50%;
+  background: #fff; border: 3px solid var(--accent);
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.7); cursor: pointer;
+}
+
+select, input[type="text"], input[type="number"] {
+  width: 100%;
+  padding: 9px 12px;
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+select:focus, input[type="text"]:focus, input[type="number"]:focus {
+  border-color: var(--accent);
+}
+
+/* ---- Buttons ---- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 16px;
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.16s ease;
+  user-select: none;
+}
+.btn:hover { background: var(--bg-3); border-color: var(--line-strong); transform: translateY(-1px); }
+.btn:active { transform: translateY(0); }
+.btn.primary {
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  border: none;
+  color: #04101c;
+  font-weight: 700;
+}
+.btn.primary:hover { box-shadow: 0 8px 24px -6px rgba(56, 189, 248, 0.55); }
+.btn-row { display: flex; gap: 10px; flex-wrap: wrap; }
+
+.chip {
+  font-family: var(--mono);
+  font-size: 11px;
+  padding: 6px 11px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--ink-dim);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.chip:hover { border-color: var(--line-strong); color: #fff; }
+.chip.active {
+  background: rgba(56, 189, 248, 0.14);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+/* ---- Readout / stats ---- */
+.readout {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--ink-dim);
+  display: flex;
+  justify-content: space-between;
+  padding: 5px 0;
+  border-bottom: 1px dashed var(--line);
+}
+.readout:last-child { border-bottom: none; }
+.readout b { color: var(--accent); font-weight: 600; }
+
+.hint { font-size: 12px; color: var(--ink-faint); line-height: 1.6; }
+
+/* ---- Canvas frame ---- */
+canvas { display: block; }
+.stage {
+  position: relative;
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: #000;
+}
+
+/* ---- scrollbars ---- */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(150,170,230,0.16); border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(150,170,230,0.30); }
+
+/* ---- utility ---- */
+.kbd {
+  font-family: var(--mono);
+  font-size: 11px;
+  padding: 2px 7px;
+  border-radius: 6px;
+  border: 1px solid var(--line-strong);
+  background: var(--bg-2);
+  color: var(--ink-dim);
+}
+.grow { flex: 1; }
+.muted { color: var(--ink-faint); }
+</style>
+<style>
+  html, body { height: 100%; overflow: hidden; }
+  .wrap {
+    display: grid;
+    grid-template-columns: 320px 1fr 300px;
+    gap: 16px;
+    height: calc(100vh - 57px);
+    padding: 16px;
+  }
+  .col { display: flex; flex-direction: column; gap: 16px; overflow-y: auto; padding-right: 4px; }
+  .center {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    min-width: 0; min-height: 0; position: relative;
+  }
+  .heatwrap {
+    position: relative; aspect-ratio: 1/1; max-height: 100%; max-width: 100%;
+    border-radius: var(--radius); overflow: hidden; border: 1px solid var(--line);
+    background: #000;
+    box-shadow: var(--shadow);
+  }
+  #wig { display: block; width: 100%; height: 100%; }
+  .axis-label {
+    position: absolute; font-family: var(--mono); font-size: 11px; color: var(--ink-faint);
+    pointer-events: none;
+  }
+  .state-name {
+    position: absolute; top: 12px; left: 14px;
+    font-size: 13px; font-weight: 700; color: var(--ink);
+    background: rgba(5,6,12,0.6); padding: 6px 12px; border-radius: 8px;
+    border: 1px solid var(--line); letter-spacing: 0.3px;
+  }
+  .colorbar { display: flex; align-items: center; gap: 10px; margin-top: 12px; font-family: var(--mono); font-size: 11px; color: var(--ink-faint); }
+  .cb-grad { width: 200px; height: 12px; border-radius: 6px; border: 1px solid var(--line);
+    background: linear-gradient(90deg,#39d0ff,#1f6fb0,#070a14,#b0521f,#ffb43a); }
+  .field.hidden { display: none; }
+  .seg { display: flex; border: 1px solid var(--line); border-radius: var(--radius-sm); overflow: hidden; }
+  .seg button { flex: 1; padding: 8px; background: var(--bg-2); border: none; color: var(--ink-dim);
+    font-size: 12px; font-weight: 600; cursor: pointer; font-family: var(--sans); transition: all .15s; }
+  .seg button + button { border-left: 1px solid var(--line); }
+  .seg button.active { background: rgba(167,139,250,0.18); color: #fff; }
+  #photon { width: 100%; height: 170px; display: block; }
+  .legend { display: flex; gap: 14px; font-size: 11px; color: var(--ink-faint); margin-top: 6px; }
+  .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; vertical-align: middle; }
+</style>
+</head>
+<body>
+
+<div class="lab-topbar">
+  <a class="lab-back" href="../../index.html">◀ Sci-Tools</a>
+  <div class="lab-title">Quantum Optics <span class="dim">/ Wigner functions of light</span></div>
+  <div class="lab-note">↳ Wigner phase-space portraits from my <b>quantum-states-of-light</b> simulation work</div>
+  <div class="lab-spacer"></div>
+  <div class="lab-tag">phase space · W(x,p)</div>
+</div>
+
+<div class="wrap">
+  <!-- ============ CONTROLS ============ -->
+  <div class="col">
+    <div class="panel panel-pad">
+      <h3>Quantum State</h3>
+      <div class="field">
+        <label><span>State</span></label>
+        <select id="state">
+          <option value="coherent">Coherent |α⟩</option>
+          <option value="squeezed">Squeezed vacuum</option>
+          <option value="thermal">Thermal</option>
+          <option value="fock">Fock / number |n⟩</option>
+          <option value="cat">Schrödinger cat</option>
+        </select>
+      </div>
+
+      <div class="field" data-for="coherent">
+        <label><span>⟨x⟩ displacement</span><span class="val" id="x0Val">2.0</span></label>
+        <input type="range" id="x0" min="-4" max="4" step="0.1" value="2">
+      </div>
+      <div class="field" data-for="coherent">
+        <label><span>⟨p⟩ displacement</span><span class="val" id="p0Val">0.0</span></label>
+        <input type="range" id="p0" min="-4" max="4" step="0.1" value="0">
+      </div>
+
+      <div class="field" data-for="squeezed">
+        <label><span>Squeeze r</span><span class="val" id="rVal">1.0</span></label>
+        <input type="range" id="r" min="0" max="2" step="0.05" value="1">
+      </div>
+      <div class="field" data-for="squeezed">
+        <label><span>Squeeze angle φ</span><span class="val" id="phiVal">0°</span></label>
+        <input type="range" id="phi" min="0" max="180" step="5" value="0">
+      </div>
+
+      <div class="field" data-for="thermal">
+        <label><span>Mean photons n̄</span><span class="val" id="nbarVal">1.5</span></label>
+        <input type="range" id="nbar" min="0" max="6" step="0.1" value="1.5">
+      </div>
+
+      <div class="field" data-for="fock">
+        <label><span>Photon number n</span><span class="val" id="fockVal">3</span></label>
+        <input type="range" id="fock" min="0" max="12" step="1" value="3">
+      </div>
+
+      <div class="field" data-for="cat">
+        <label><span>Coherent amplitude |α|</span><span class="val" id="catAVal">2.5</span></label>
+        <input type="range" id="catA" min="0.5" max="3.5" step="0.1" value="2.5">
+      </div>
+      <div class="field" data-for="cat" style="margin-bottom:0">
+        <label><span>Parity</span></label>
+        <div class="seg" id="parity">
+          <button data-v="1" class="active">Even (+)</button>
+          <button data-v="-1">Odd (−)</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel panel-pad">
+      <h3>Gallery</h3>
+      <div class="preset-grid" style="display:flex;flex-wrap:wrap;gap:7px;">
+        <button class="chip" data-g="vacuum">Vacuum</button>
+        <button class="chip" data-g="coh">Coherent</button>
+        <button class="chip" data-g="sqz">Squeezed</button>
+        <button class="chip" data-g="single">Single photon</button>
+        <button class="chip" data-g="cat">Cat state</button>
+        <button class="chip" data-g="thermal">Thermal</button>
+      </div>
+    </div>
+
+    <p class="hint">
+      The <b>Wigner function</b> is the closest thing to a "probability density" in phase space
+      (x = position quadrature, p = momentum quadrature). Classical-ish states stay positive;
+      <b>negative</b> regions (the blue fringes of cat and Fock states) are a smoking-gun signature
+      of genuinely <b>nonclassical</b> light. Watch the negativity volume and the uncertainty product
+      ΔxΔp ≥ ½.
+    </p>
+  </div>
+
+  <!-- ============ HEATMAP ============ -->
+  <div class="center">
+    <div class="heatwrap" id="heatwrap">
+      <div class="state-name" id="stateName">Coherent |α⟩</div>
+      <canvas id="wig" width="480" height="480"></canvas>
+    </div>
+    <div class="colorbar">
+      <span>− W(x,p)</span>
+      <div class="cb-grad"></div>
+      <span>+ W(x,p)</span>
+    </div>
+  </div>
+
+  <!-- ============ STATS + PHOTONS ============ -->
+  <div class="col">
+    <div class="panel panel-pad">
+      <h3>Phase-space moments</h3>
+      <div class="readout"><span>⟨n⟩ mean photons</span><b id="mN">0.00</b></div>
+      <div class="readout"><span>⟨x⟩, ⟨p⟩</span><b id="mXP">0, 0</b></div>
+      <div class="readout"><span>Δx</span><b id="mDx">0.71</b></div>
+      <div class="readout"><span>Δp</span><b id="mDp">0.71</b></div>
+      <div class="readout"><span>Δx·Δp</span><b id="mUnc">0.50</b></div>
+      <div class="readout"><span>Purity Tr(ρ²)</span><b id="mPur">1.00</b></div>
+      <div class="readout"><span>Negativity δ</span><b id="mNeg">0.00</b></div>
+    </div>
+
+    <div class="panel panel-pad">
+      <h3>Photon-number P(n)</h3>
+      <canvas id="photon"></canvas>
+      <div class="legend"><span><i style="background:#a78bfa"></i>probability of detecting n photons</span></div>
+    </div>
+
+    <div class="panel panel-pad">
+      <h3>Reading the plot</h3>
+      <p class="hint" style="margin:0">
+        Warm = positive, cool/blue = <b>negative</b> (impossible classically).
+        A coherent state is a fuzzy ball at (⟨x⟩,⟨p⟩); squeezing flattens it below the
+        vacuum limit along one axis; a cat shows two lobes with interference fringes between them.
+      </p>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+/* ============================================================
+   Wigner functions of canonical states of light (ħ = 1).
+   Vacuum:  W = (1/π) exp(-(x²+p²))   (variance ½ per quadrature)
+   All moments (⟨n⟩, purity, negativity, Δx·Δp) are computed
+   numerically from the grid — a single robust path for every state.
+   ============================================================ */
+
+const P = {
+  state: 'coherent',
+  x0: 2, p0: 0,        // coherent displacement
+  r: 1, phi: 0,        // squeezing
+  nbar: 1.5,           // thermal
+  fock: 3,             // number state
+  catA: 2.5, parity: 1 // cat
+};
+
+const GRID = 220;                 // evaluation resolution
+let R = 6;                        // half-extent of phase space window
+
+// Laguerre polynomial L_n(z)
+function laguerre(n, z) {
+  if (n === 0) return 1;
+  let l0 = 1, l1 = 1 - z;
+  for (let k = 1; k < n; k++) {
+    const l2 = ((2 * k + 1 - z) * l1 - k * l0) / (k + 1);
+    l0 = l1; l1 = l2;
+  }
+  return l1;
+}
+
+function factorial(n) { let f = 1; for (let i = 2; i <= n; i++) f *= i; return f; }
+
+// pick a sensible window for the active state
+function chooseR() {
+  switch (P.state) {
+    case 'coherent': return Math.max(4.5, Math.hypot(P.x0, P.p0) + 3);
+    case 'squeezed': return Math.max(4.5, Math.exp(P.r) * 2.2);
+    case 'thermal':  return Math.max(4.5, Math.sqrt(2 * P.nbar + 1) * 3);
+    case 'fock':     return Math.max(4.5, Math.sqrt(2 * P.fock + 1) * 2 + 1);
+    case 'cat':      return Math.max(4.5, Math.SQRT2 * P.catA + 3.5);
+  }
+  return 6;
+}
+
+// Wigner value at (x,p) for the active state
+function wignerAt(x, p) {
+  const INVPI = 1 / Math.PI;
+  switch (P.state) {
+    case 'coherent': {
+      const dx = x - P.x0, dp = p - P.p0;
+      return INVPI * Math.exp(-(dx * dx + dp * dp));
+    }
+    case 'squeezed': {
+      // rotate by -φ; squeezed (narrow) quadrature u gets factor e^{2r}
+      const a = -P.phi * Math.PI / 180;
+      const c = Math.cos(a), s = Math.sin(a);
+      const u = c * x - s * p;
+      const v = s * x + c * p;
+      return INVPI * Math.exp(-Math.exp(2 * P.r) * u * u - Math.exp(-2 * P.r) * v * v);
+    }
+    case 'thermal': {
+      const d = 2 * P.nbar + 1;
+      return INVPI / d * Math.exp(-(x * x + p * p) / d);
+    }
+    case 'fock': {
+      const n = P.fock, r2 = x * x + p * p;
+      const sign = (n % 2 === 0) ? 1 : -1;
+      return sign * INVPI * Math.exp(-r2) * laguerre(n, 2 * r2);
+    }
+    case 'cat': {
+      const a = P.catA, x0 = Math.SQRT2 * a, par = P.parity;
+      const N = 2 * (1 + par * Math.exp(-2 * a * a));
+      const g1 = Math.exp(-((x - x0) * (x - x0)) - p * p);
+      const g2 = Math.exp(-((x + x0) * (x + x0)) - p * p);
+      const interf = 2 * Math.exp(-(x * x + p * p)) * Math.cos(2 * x0 * p);
+      return INVPI / N * (g1 + g2 + par * interf);
+    }
+  }
+  return 0;
+}
+
+// ---------- diverging colormap (cool-neg / dark-zero / warm-pos) ----------
+function divColor(v) {
+  // v in [-1, 1]
+  v = Math.max(-1, Math.min(1, v));
+  const lerp = (a, b, t) => [a[0]+(b[0]-a[0])*t, a[1]+(b[1]-a[1])*t, a[2]+(b[2]-a[2])*t];
+  const dark = [7, 10, 20];
+  if (v >= 0) {
+    // dark -> amber -> white
+    const amber = [224, 130, 40], white = [255, 235, 200];
+    const t = Math.pow(v, 0.75);
+    let c = t < 0.6 ? lerp(dark, amber, t / 0.6) : lerp(amber, white, (t - 0.6) / 0.4);
+    return c;
+  } else {
+    const cyan = [40, 150, 220], pale = [180, 225, 255];
+    const t = Math.pow(-v, 0.75);
+    let c = t < 0.6 ? lerp(dark, cyan, t / 0.6) : lerp(cyan, pale, (t - 0.6) / 0.4);
+    return c;
+  }
+}
+
+// ---------- render ----------
+const wig = document.getElementById('wig');
+const wctx = wig.getContext('2d');
+const off = document.createElement('canvas');
+off.width = GRID; off.height = GRID;
+const offctx = off.getContext('2d');
+const img = offctx.createImageData(GRID, GRID);
+
+function computeAndDraw() {
+  R = chooseR();
+  const W = new Float64Array(GRID * GRID);
+  let wmax = 0;
+  const dx = (2 * R) / (GRID - 1);
+  // sums for moments
+  let s0 = 0, sx = 0, sp = 0, sxx = 0, spp = 0, sw2 = 0, sabs = 0;
+  for (let j = 0; j < GRID; j++) {
+    const p = R - j * dx;                 // top = +R
+    for (let i = 0; i < GRID; i++) {
+      const x = -R + i * dx;
+      const w = wignerAt(x, p);
+      W[j * GRID + i] = w;
+      const aw = Math.abs(w);
+      if (aw > wmax) wmax = aw;
+      const dA = dx * dx;
+      s0 += w * dA; sx += x * w * dA; sp += p * w * dA;
+      sxx += x * x * w * dA; spp += p * p * w * dA;
+      sw2 += w * w * dA; sabs += aw * dA;
+    }
+  }
+  // paint
+  const d = img.data;
+  for (let k = 0; k < GRID * GRID; k++) {
+    const c = divColor(W[k] / (wmax || 1));
+    const o = k * 4;
+    d[o] = c[0] | 0; d[o + 1] = c[1] | 0; d[o + 2] = c[2] | 0; d[o + 3] = 255;
+  }
+  offctx.putImageData(img, 0, 0);
+  wctx.imageSmoothingEnabled = true;
+  wctx.clearRect(0, 0, wig.width, wig.height);
+  wctx.drawImage(off, 0, 0, GRID, GRID, 0, 0, wig.width, wig.height);
+  // axes
+  drawAxes();
+
+  // moments (normalize by s0 to tame grid truncation)
+  const norm = s0 || 1;
+  const mx = sx / norm, mp = sp / norm;
+  const xx = sxx / norm, pp = spp / norm;
+  const dxv = Math.sqrt(Math.max(0, xx - mx * mx));
+  const dpv = Math.sqrt(Math.max(0, pp - mp * mp));
+  const nMean = (xx + pp) / 2 - 0.5;
+  const purity = 2 * Math.PI * sw2;          // Tr(ρ²) = 2π ∫W²
+  const negVol = (sabs - s0) / 2;            // negative-area magnitude
+
+  document.getElementById('mN').textContent = Math.max(0, nMean).toFixed(2);
+  document.getElementById('mXP').textContent = mx.toFixed(2) + ', ' + mp.toFixed(2);
+  document.getElementById('mDx').textContent = dxv.toFixed(3);
+  document.getElementById('mDp').textContent = dpv.toFixed(3);
+  const unc = document.getElementById('mUnc');
+  unc.textContent = (dxv * dpv).toFixed(3);
+  unc.style.color = (dxv * dpv < 0.499) ? 'var(--aurora-pink)' : 'var(--accent)';
+  document.getElementById('mPur').textContent = Math.min(1, purity).toFixed(3);
+  const neg = document.getElementById('mNeg');
+  neg.textContent = negVol.toFixed(3);
+  neg.style.color = negVol > 0.005 ? 'var(--aurora-cyan)' : 'var(--ink-faint)';
+
+  drawPhotons();
+}
+
+function drawAxes() {
+  const w = wig.width, h = wig.height;
+  wctx.strokeStyle = 'rgba(232,236,248,0.18)';
+  wctx.lineWidth = 1;
+  wctx.beginPath();
+  wctx.moveTo(w / 2, 0); wctx.lineTo(w / 2, h);
+  wctx.moveTo(0, h / 2); wctx.lineTo(w, h / 2);
+  wctx.stroke();
+  wctx.fillStyle = 'rgba(232,236,248,0.55)';
+  wctx.font = '12px ui-monospace, monospace';
+  wctx.fillText('x', w - 16, h / 2 - 6);
+  wctx.fillText('p', w / 2 + 6, 14);
+  wctx.fillStyle = 'rgba(107,116,143,0.8)';
+  wctx.font = '10px ui-monospace, monospace';
+  wctx.fillText('+' + R.toFixed(1), w / 2 + 4, 12);
+  wctx.fillText('−' + R.toFixed(1), w / 2 + 4, h - 4);
+}
+
+// ---------- photon number distribution ----------
+function photonDist() {
+  const out = [];
+  const a2 = (P.state === 'coherent') ? (P.x0 * P.x0 + P.p0 * P.p0) / 2 : 0;
+  switch (P.state) {
+    case 'coherent': {
+      for (let n = 0; n <= 24; n++) out.push(Math.exp(-a2) * Math.pow(a2, n) / factorial(n));
+      break;
+    }
+    case 'thermal': {
+      const nb = P.nbar;
+      for (let n = 0; n <= 24; n++) out.push(Math.pow(nb, n) / Math.pow(1 + nb, n + 1));
+      break;
+    }
+    case 'fock': {
+      for (let n = 0; n <= 24; n++) out.push(n === P.fock ? 1 : 0);
+      break;
+    }
+    case 'squeezed': {
+      // squeezed vacuum: only even n
+      const th = Math.tanh(P.r), ch = Math.cosh(P.r);
+      for (let n = 0; n <= 24; n++) {
+        if (n % 2 === 1) { out.push(0); continue; }
+        const m = n / 2;
+        // |<2m|squeezed vacuum>|² = (tanh r)^{2m} / cosh r · [ (2m)! / (2^m m!)² ]
+        const term = Math.pow(th, 2 * m) / ch *
+          (factorial(2 * m) / Math.pow(Math.pow(2, m) * factorial(m), 2));
+        out.push(term);
+      }
+      break;
+    }
+    case 'cat': {
+      const a = P.catA, par = P.parity;
+      const Norm = 2 * (1 + par * Math.exp(-2 * a * a));
+      for (let n = 0; n <= 24; n++) {
+        const keep = (par === 1) ? (n % 2 === 0) : (n % 2 === 1);
+        if (!keep) { out.push(0); continue; }
+        // P(n) = 4 e^{-a²} a^{2n} / (n! · Norm)
+        const term = 4 * Math.exp(-a * a) * Math.pow(a * a, n) / factorial(n) / Norm;
+        out.push(term);
+      }
+      break;
+    }
+  }
+  return out;
+}
+
+const photon = document.getElementById('photon');
+const pctx = photon.getContext('2d');
+function drawPhotons() {
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const rect = photon.getBoundingClientRect();
+  photon.width = rect.width * dpr; photon.height = rect.height * dpr;
+  pctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const w = rect.width, h = rect.height, pad = 8, base = h - 18;
+  pctx.clearRect(0, 0, w, h);
+  const dist = photonDist();
+  // find display range (trim trailing zeros)
+  let nmax = 0;
+  for (let n = 0; n < dist.length; n++) if (dist[n] > 0.001) nmax = n;
+  nmax = Math.max(6, Math.min(20, nmax + 1));
+  let pmax = 0;
+  for (let n = 0; n <= nmax; n++) pmax = Math.max(pmax, dist[n] || 0);
+  pmax = Math.max(pmax, 0.05);
+  const bw = (w - 2 * pad) / (nmax + 1);
+  for (let n = 0; n <= nmax; n++) {
+    const v = (dist[n] || 0) / pmax;
+    const bh = v * (base - 6);
+    const x = pad + n * bw, y = base - bh;
+    const g = pctx.createLinearGradient(0, y, 0, base);
+    g.addColorStop(0, '#a78bfa'); g.addColorStop(1, 'rgba(167,139,250,0.15)');
+    pctx.fillStyle = g;
+    pctx.fillRect(x + 1, y, bw - 2, bh);
+    if (n % 2 === 0 || nmax <= 12) {
+      pctx.fillStyle = 'rgba(107,116,143,0.9)';
+      pctx.font = '9px ui-monospace, monospace';
+      pctx.fillText(n, x + bw / 2 - 3, h - 5);
+    }
+  }
+  pctx.strokeStyle = 'rgba(150,170,230,0.15)';
+  pctx.beginPath(); pctx.moveTo(pad, base); pctx.lineTo(w - pad, base); pctx.stroke();
+}
+
+// ---------- sizing for square heatmap (draw in device px, CSS scales down) ----------
+function sizeHeat() {
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const rect = document.getElementById('heatwrap').getBoundingClientRect();
+  const s = Math.max(2, Math.min(rect.width, rect.height));
+  wig.width = Math.round(s * dpr);
+  wig.height = Math.round(s * dpr);
+}
+
+// ---------- UI ----------
+const NAMES = { coherent: 'Coherent |α⟩', squeezed: 'Squeezed vacuum', thermal: 'Thermal state', fock: 'Fock state |n⟩', cat: 'Schrödinger cat' };
+function syncFields() {
+  document.querySelectorAll('[data-for]').forEach(el => {
+    el.classList.toggle('hidden', el.dataset.for !== P.state);
+  });
+  document.getElementById('stateName').textContent = NAMES[P.state];
+}
+
+function bind(id, valId, fmt, key, after) {
+  const el = document.getElementById(id), v = document.getElementById(valId);
+  const upd = () => { P[key] = parseFloat(el.value); if (v) v.textContent = fmt(P[key]); render(); if (after) after(); };
+  el.addEventListener('input', upd);
+}
+bind('x0', 'x0Val', x => x.toFixed(1), 'x0');
+bind('p0', 'p0Val', x => x.toFixed(1), 'p0');
+bind('r', 'rVal', x => x.toFixed(2), 'r');
+bind('phi', 'phiVal', x => x.toFixed(0) + '°', 'phi');
+bind('nbar', 'nbarVal', x => x.toFixed(1), 'nbar');
+bind('fock', 'fockVal', x => x.toFixed(0), 'fock');
+bind('catA', 'catAVal', x => x.toFixed(1), 'catA');
+
+document.getElementById('state').addEventListener('change', e => {
+  P.state = e.target.value; syncFields(); render();
+});
+document.querySelectorAll('#parity button').forEach(b => {
+  b.addEventListener('click', () => {
+    document.querySelectorAll('#parity button').forEach(x => x.classList.remove('active'));
+    b.classList.add('active'); P.parity = parseFloat(b.dataset.v); render();
+  });
+});
+
+const GAL = {
+  vacuum:  { state: 'coherent', x0: 0, p0: 0 },
+  coh:     { state: 'coherent', x0: 2.2, p0: 1.2 },
+  sqz:     { state: 'squeezed', r: 1.1, phi: 30 },
+  single:  { state: 'fock', fock: 1 },
+  cat:     { state: 'cat', catA: 2.6, parity: 1 },
+  thermal: { state: 'thermal', nbar: 2.0 }
+};
+document.querySelectorAll('[data-g]').forEach(c => {
+  c.addEventListener('click', () => {
+    Object.assign(P, GAL[c.dataset.g]);
+    // reflect into widgets
+    document.getElementById('state').value = P.state;
+    const setv = (id, vid, fmt) => { const e = document.getElementById(id); if (e && P[id] !== undefined) { e.value = P[id]; const v = document.getElementById(vid); if (v) v.textContent = fmt(P[id]); } };
+    setv('x0','x0Val',x=>(+x).toFixed(1)); setv('p0','p0Val',x=>(+x).toFixed(1));
+    setv('r','rVal',x=>(+x).toFixed(2)); setv('phi','phiVal',x=>(+x).toFixed(0)+'°');
+    setv('nbar','nbarVal',x=>(+x).toFixed(1)); setv('fock','fockVal',x=>(+x).toFixed(0));
+    setv('catA','catAVal',x=>(+x).toFixed(1));
+    document.querySelectorAll('#parity button').forEach(x => x.classList.toggle('active', parseFloat(x.dataset.v) === P.parity));
+    syncFields(); render();
+    document.querySelectorAll('[data-g]').forEach(x => x.classList.remove('active'));
+    c.classList.add('active');
+  });
+});
+
+let raf = null;
+function render() { if (raf) return; raf = requestAnimationFrame(() => { raf = null; computeAndDraw(); }); }
+
+function onResize() { sizeHeat(); render(); }
+window.addEventListener('resize', onResize);
+
+// boot
+syncFields();
+sizeHeat();
+computeAndDraw();
+</script>
+</body>
+</html>

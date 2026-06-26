@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sci-Tools — offline calculators for the lab</title>
+<meta name="description" content="A suite of offline, zero-dependency science &amp; engineering calculators by Syed Abbas Ahmad — physicist &amp; ML engineer. Open them in a browser; nothing is uploaded anywhere.">
+<meta name="author" content="Syed Abbas Ahmad">
+<meta property="og:title" content="Sci-Tools — offline calculators for the lab">
+<meta property="og:description" content="Five offline, zero-dependency science &amp; engineering calculators, plus three interactive physics demos. Open source, MIT.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,600&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+<div class="bench" aria-hidden="true"></div>
+
+<header class="topbar wrap">
+  <a class="brand" href="./index.html">
+    <span class="mark">Sci-Tools</span>
+    <span class="slash">// for the lab</span>
+  </a>
+  <span class="spacer"></span>
+  <a class="ghost" href="https://github.com/abbas-ahmad-cowlar/sci-tools" target="_blank" rel="noopener">source ↗</a>
+</header>
+
+<main class="wrap">
+
+  <!-- ============ HERO ============ -->
+  <section class="hero">
+    <div class="hero-copy">
+      <div class="eyebrow">offline &middot; zero-dependency &middot; open source</div>
+      <h1>Sharp little tools,<br>built for the <em>lab&nbsp;bench</em>.</h1>
+      <p class="lede">A suite of science &amp; engineering calculators that run entirely
+        in your browser. No install, no build step, nothing uploaded anywhere — just open
+        and use them.</p>
+      <p class="who">Built by <b>Syed Abbas Ahmad</b> — physicist &amp; ML&nbsp;engineer.</p>
+      <div class="chips">
+        <span class="chip"><span class="dot"></span> Runs from <code>file://</code></span>
+        <span class="chip"><span class="dot"></span> Zero dependencies</span>
+        <span class="chip"><span class="dot"></span> Open source &middot; MIT</span>
+      </div>
+    </div>
+
+    <!-- oscilloscope plot -->
+    <div class="scope" aria-hidden="true">
+      <span class="scope-label">trace · damped oscillation</span>
+      <span class="scope-readout" id="readout">A·e^(−t/τ)·cos ωt</span>
+      <svg viewBox="0 0 600 280" preserveAspectRatio="none">
+        <g id="gridlines"></g>
+        <line class="axis" x1="20" y1="145" x2="580" y2="145"></line>
+        <path id="trace" class="trace"></path>
+        <circle id="probe" class="probe" r="4"></circle>
+      </svg>
+    </div>
+  </section>
+
+  <!-- ============ TOOLS ============ -->
+  <section class="section tools">
+    <div class="section-head">
+      <span class="idx">01 — 05</span>
+      <h2>Tools</h2>
+      <span class="note">single-file calculators · open in a browser</span>
+    </div>
+    <div class="grid">
+
+      <a class="card" href="tools/bitforge/index.html">
+        <span class="num">01</span>
+        <h3 class="name">bitforge</h3>
+        <div class="kicker">register &amp; bitfield workbench</div>
+        <p class="desc">Decode a datasheet's status register, toggle bits, carve named
+          fields, and copy out the C macros. 64-bit math that doesn't silently truncate.</p>
+        <div class="meta">
+          <span class="spec">1 file · 0 deps · BigInt-exact</span>
+          <span class="open">open <span class="arr">→</span></span>
+        </div>
+      </a>
+
+      <a class="card" href="tools/propagate/index.html">
+        <span class="num">02</span>
+        <h3 class="name">propagate</h3>
+        <div class="kicker">uncertainty &amp; error budget</div>
+        <p class="desc">Type a formula and your ±1σ inputs; get the result, its propagated
+          uncertainty, and — the part people skip — which measurement to improve first.</p>
+        <div class="meta">
+          <span class="spec">57/57 tests · GUM first-order</span>
+          <span class="open">open <span class="arr">→</span></span>
+        </div>
+      </a>
+
+      <a class="card" href="tools/photonbench/index.html">
+        <span class="num">03</span>
+        <h3 class="name">photonbench</h3>
+        <div class="kicker">photonics &amp; units workbench</div>
+        <p class="desc">Convert λ ↔ ν ↔ E ↔ ν̃, do real dimensional arithmetic that refuses
+          to add metres to seconds, juggle optical power in dB, grab CODATA constants.</p>
+        <div class="meta">
+          <span class="spec">0 deps · CODATA 2018</span>
+          <span class="open">open <span class="arr">→</span></span>
+        </div>
+      </a>
+
+      <a class="card" href="tools/fitbench/index.html">
+        <span class="num">04</span>
+        <h3 class="name">fitbench</h3>
+        <div class="kicker">least-squares curve fitting</div>
+        <p class="desc">Paste two columns, pick a model, get fitted parameters <em>with
+          uncertainties</em>, goodness-of-fit, a residual plot, and runnable SciPy to
+          reproduce it.</p>
+        <div class="meta">
+          <span class="spec">0 deps · Levenberg–Marquardt</span>
+          <span class="open">open <span class="arr">→</span></span>
+        </div>
+      </a>
+
+      <a class="card" href="tools/regex-lab/index.html">
+        <span class="num">05</span>
+        <h3 class="name">regex-lab</h3>
+        <div class="kicker">regex tester &amp; explainer</div>
+        <p class="desc">See your pattern explained in plain English, drawn as a railroad
+          diagram, and matched live as you type — for the moment you're staring at someone
+          else's regex.</p>
+        <div class="meta">
+          <span class="spec">1 file · 0 deps · railroad</span>
+          <span class="open">open <span class="arr">→</span></span>
+        </div>
+      </a>
+
+    </div>
+  </section>
+
+  <!-- ============ DEMOS ============ -->
+  <section class="section demos">
+    <div class="section-head">
+      <span class="idx">06 — 08</span>
+      <h2>Demos</h2>
+      <span class="note">interactive physics · the methods behind my paid work</span>
+    </div>
+    <div class="grid">
+
+      <a class="card" href="demos/optimizer/index.html">
+        <span class="num">06</span>
+        <h3 class="name">Optimizer Arena</h3>
+        <div class="kicker">metaheuristics on 2D landscapes</div>
+        <p class="desc">PSO, Differential Evolution, Simulated Annealing and a GA hunting
+          global minima on Rastrigin, Ackley and Schwefel — with a live convergence plot.</p>
+        <p class="tie">the solvers behind my surrogate-assisted CMA-ES / BBOB benchmark
+          &amp; facility-location work.</p>
+        <div class="meta">
+          <span class="spec">PSO · DE · SA · GA</span>
+          <span class="open">launch <span class="arr">→</span></span>
+        </div>
+      </a>
+
+      <a class="card" href="demos/soliton/index.html">
+        <span class="num">07</span>
+        <h3 class="name">Soliton Lab</h3>
+        <div class="kicker">nonlinear Schrödinger, live</div>
+        <p class="desc">A pulse propagating down a nonlinear fibre, solved in real time by
+          the split-step Fourier method — fundamental solitons, breathers, fission,
+          collisions.</p>
+        <p class="tie">the split-step NLSE solver behind my nonlinear fiber-optics &amp;
+          pulse-propagation work.</p>
+        <div class="meta">
+          <span class="spec">split-step Fourier · NLSE</span>
+          <span class="open">launch <span class="arr">→</span></span>
+        </div>
+      </a>
+
+      <a class="card" href="demos/wigner/index.html">
+        <span class="num">08</span>
+        <h3 class="name">Quantum Optics</h3>
+        <div class="kicker">Wigner functions of light</div>
+        <p class="desc">Phase-space portraits of coherent, squeezed, thermal, Fock and cat
+          states — including the Wigner negativity that marks genuinely non-classical light.</p>
+        <p class="tie">phase-space portraits from my quantum-states-of-light simulation
+          work.</p>
+        <div class="meta">
+          <span class="spec">Wigner · purity · negativity</span>
+          <span class="open">launch <span class="arr">→</span></span>
+        </div>
+      </a>
+
+    </div>
+  </section>
+
+  <footer class="foot">
+    <span class="sig">Built by <b>Syed Abbas Ahmad</b> · physicist &amp; ML engineer</span>
+    <span class="spacer"></span>
+    <a href="https://github.com/abbas-ahmad-cowlar/sci-tools" target="_blank" rel="noopener">GitHub</a>
+    <span>MIT licensed · © 2026 Abbas Ahmad</span>
+  </footer>
+
+</main>
+
+<script>
+/* Draw the hero's damped-oscillation trace exactly, plus light grid lines.
+   Purely decorative; the tools themselves carry no such dependency. */
+(function () {
+  var W = 600, H = 280, x0 = 20, x1 = 580, mid = 145, amp = 96, tau = 0.42, omega = 22;
+  var trace = document.getElementById("trace");
+  var probe = document.getElementById("probe");
+  var g = document.getElementById("gridlines");
+  if (!trace) return;
+
+  // faint vertical grid lines
+  var lines = "";
+  for (var gx = 0; gx <= 10; gx++) {
+    var X = x0 + (gx / 10) * (x1 - x0);
+    lines += '<line class="grid-line" x1="' + X.toFixed(1) + '" y1="20" x2="' + X.toFixed(1) + '" y2="260"></line>';
+  }
+  g.innerHTML = lines;
+
+  // damped cosine: y = mid - A·e^(-t/τ)·cos(ω t)
+  var d = "", N = 260, lastX = x1, lastY = mid;
+  for (var i = 0; i <= N; i++) {
+    var t = i / N;
+    var px = x0 + t * (x1 - x0);
+    var env = Math.exp(-t / tau);
+    var py = mid - amp * env * Math.cos(omega * t);
+    d += (i ? "L" : "M") + px.toFixed(2) + " " + py.toFixed(2);
+    lastX = px; lastY = py;
+  }
+  trace.setAttribute("d", d);
+  probe.setAttribute("cx", lastX.toFixed(2));
+  probe.setAttribute("cy", lastY.toFixed(2));
+
+  // size the dash animation to the real path length
+  try {
+    var len = trace.getTotalLength();
+    trace.style.strokeDasharray = len;
+    trace.style.strokeDashoffset = len;
+    // restart the keyframe with the measured length
+    trace.style.animation = "none";
+    void trace.getBBox();
+    trace.style.animation = "draw 2.4s cubic-bezier(.22,.61,.36,1) .35s forwards";
+  } catch (e) { /* getTotalLength unsupported — CSS fallback handles it */ }
+})();
+</script>
+</body>
+</html>

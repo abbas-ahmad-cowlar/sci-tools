@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FitBench — least-squares curve fitting</title>
+  <meta name="description" content="Offline curve-fitting workbench: linear, polynomial, Gaussian, Lorentzian, exponential and custom models with parameter uncertainties and residuals. No install, no internet." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-glyph" aria-hidden="true">∿</span>
+      <div>
+        <h1>FitBench</h1>
+        <p>least-squares curve fitting · runs entirely offline</p>
+      </div>
+    </div>
+    <div class="topbar-note">paste data → pick a model → fit. parameters come with uncertainties.</div>
+  </header>
+
+  <main class="layout">
+    <!-- ============ controls ============ -->
+    <aside class="panel controls">
+      <section class="block">
+        <div class="block-head">
+          <h2>Data</h2>
+          <div class="block-actions">
+            <button id="ex1" class="chip" type="button">Gaussian peak</button>
+            <button id="ex2" class="chip" type="button">Decay</button>
+            <label class="chip file">Open…<input id="fileIn" type="file" accept=".csv,.txt,.dat,.tsv" hidden /></label>
+          </div>
+        </div>
+        <textarea id="data" spellcheck="false" placeholder="# x   y   [y_err]
+1.0   2.13
+2.0   3.95
+3.0   6.02
+..."></textarea>
+        <p class="hint">Two or three columns: <b>x&nbsp;&nbsp;y&nbsp;&nbsp;[y-error]</b>. Space, comma or tab separated. Lines starting with # are ignored.</p>
+      </section>
+
+      <section class="block">
+        <div class="block-head"><h2>Model</h2></div>
+        <select id="model" class="select"></select>
+
+        <div id="degreeRow" class="opt-row">
+          <label for="degree">Polynomial degree</label>
+          <input id="degree" type="number" min="1" max="10" value="2" class="num" />
+        </div>
+        <div id="formulaRow" class="opt-row formula-row">
+          <label for="formula">f(x) =</label>
+          <input id="formula" type="text" class="text" value="a*exp(-b*x)*cos(c*x) + d"
+                 spellcheck="false" />
+          <p class="hint">Use <code>x</code> and single-letter parameters. Functions: exp, ln, log, sin, cos, sqrt, abs, erf, gauss(x,μ,σ)…</p>
+        </div>
+
+        <div class="checks">
+          <label class="check"><input id="useErr" type="checkbox" checked /> weight by y-errors (if given)</label>
+          <label class="check"><input id="logx" type="checkbox" /> log x-axis</label>
+          <label class="check"><input id="logy" type="checkbox" /> log y-axis</label>
+        </div>
+
+        <button id="fitBtn" class="fit-btn" type="button">Fit&nbsp;&nbsp;⏎</button>
+        <p class="hint kbd-hint">tip: <kbd>Ctrl</kbd>+<kbd>Enter</kbd> in the data box also fits</p>
+      </section>
+    </aside>
+
+    <!-- ============ plot + results ============ -->
+    <section class="stage">
+      <div class="panel plot-card">
+        <canvas id="plot"></canvas>
+      </div>
+
+      <div class="results">
+        <div class="panel result-block">
+          <div class="result-head">
+            <h2>Parameters</h2>
+            <div class="result-actions">
+              <button id="copyParams" class="chip" type="button">Copy</button>
+              <button id="copyPy" class="chip" type="button">Copy Python</button>
+            </div>
+          </div>
+          <div id="status" class="status">—</div>
+          <div id="params" class="params"></div>
+        </div>
+
+        <div class="panel result-block">
+          <div class="result-head">
+            <h2>Goodness of fit</h2>
+            <div class="result-actions">
+              <button id="expCsv" class="chip" type="button">Curve CSV</button>
+              <button id="expPng" class="chip" type="button">Plot PNG</button>
+            </div>
+          </div>
+          <div id="gof" class="gof"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="toast" class="toast"></div>
+
+  <script src="src/linalg.js"></script>
+  <script src="src/models.js"></script>
+  <script src="src/fit.js"></script>
+  <script src="src/plot.js"></script>
+  <script src="src/app.js"></script>
+</body>
+</html>

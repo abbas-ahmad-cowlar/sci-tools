@@ -1,0 +1,9 @@
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+desktop.ini
+*.log
+
+# dev-only test deps (the tools themselves ship with none)
+**/test/node_modules/
+**/node_modules/

@@ -1,0 +1,1544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Optimizer Arena — Sci-Tools</title>
+<style data-inlined="lab.css">
+/* ============================================================
+   THE MIDNIGHT LAB — shared design system
+   "Aurora over a midnight sea" — dark, luminous, scientific.
+   Fully self-contained: system fonts only, no external assets.
+   ============================================================ */
+
+:root {
+  /* Base surfaces */
+  --bg-0: #05060c;     /* deepest background */
+  --bg-1: #090b14;     /* panel base */
+  --bg-2: #0e1120;     /* raised panel */
+  --bg-3: #151a2e;     /* hover / active */
+  --line: rgba(150, 170, 230, 0.10);
+  --line-strong: rgba(150, 170, 230, 0.22);
+
+  /* Text */
+  --ink: #e8ecf8;
+  --ink-dim: #aab3cf;
+  --ink-faint: #6b748f;
+
+  /* Aurora accents */
+  --aurora-teal:  #4fd1c5;
+  --aurora-cyan:  #38bdf8;
+  --aurora-violet:#a78bfa;
+  --aurora-pink:  #f472b6;
+  --aurora-amber: #fbbf24;
+  --aurora-lime:  #a3e635;
+
+  --accent: var(--aurora-cyan);
+  --accent-2: var(--aurora-violet);
+
+  /* Effects */
+  --glow: 0 0 24px;
+  --radius: 16px;
+  --radius-sm: 10px;
+  --shadow: 0 18px 50px -18px rgba(0, 0, 0, 0.8);
+
+  --mono: ui-monospace, "Cascadia Code", "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace;
+  --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+}
+
+body {
+  font-family: var(--sans);
+  color: var(--ink);
+  background:
+    radial-gradient(1200px 700px at 12% -10%, rgba(79, 209, 197, 0.10), transparent 60%),
+    radial-gradient(1100px 800px at 100% 0%, rgba(167, 139, 250, 0.12), transparent 55%),
+    radial-gradient(900px 700px at 50% 120%, rgba(56, 189, 248, 0.08), transparent 60%),
+    var(--bg-0);
+  background-attachment: fixed;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  letter-spacing: 0.1px;
+}
+
+::selection { background: rgba(56, 189, 248, 0.30); color: #fff; }
+
+a { color: var(--accent); text-decoration: none; }
+a:hover { color: #fff; }
+
+/* ---- Top bar (shared chrome across experiments) ---- */
+.lab-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 22px;
+  background: linear-gradient(180deg, rgba(9, 11, 20, 0.92), rgba(9, 11, 20, 0.55));
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--line);
+}
+.lab-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-dim);
+  padding: 7px 13px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.02);
+  transition: all 0.18s ease;
+}
+.lab-back:hover {
+  color: #fff;
+  border-color: var(--line-strong);
+  background: rgba(56, 189, 248, 0.10);
+  transform: translateX(-2px);
+}
+.lab-title {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+.lab-title .dim { color: var(--ink-faint); font-weight: 500; }
+.lab-note { font-size: 12px; color: var(--ink-faint); font-style: italic; }
+.lab-note b { color: var(--ink-dim); font-style: normal; font-weight: 600; }
+@media (max-width: 820px) { .lab-note { display: none; } }
+.lab-spacer { flex: 1; }
+.lab-tag {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink-faint);
+  padding: 5px 11px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+/* ---- Control panel / glass cards ---- */
+.panel {
+  background: linear-gradient(180deg, rgba(20, 26, 46, 0.55), rgba(10, 13, 24, 0.65));
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+.panel-pad { padding: 18px; }
+
+.panel h3, .panel-title {
+  margin: 0 0 14px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+/* ---- Form controls ---- */
+.field { margin-bottom: 16px; }
+.field:last-child { margin-bottom: 0; }
+.field label {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 12.5px;
+  color: var(--ink-dim);
+  margin-bottom: 7px;
+  font-weight: 500;
+}
+.field label .val {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  outline: none;
+  cursor: pointer;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  border: 3px solid var(--accent);
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.7);
+  cursor: pointer;
+  transition: transform 0.12s ease;
+}
+input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.18); }
+input[type="range"]::-moz-range-thumb {
+  width: 16px; height: 16px; border-radius: 50%;
+  background: #fff; border: 3px solid var(--accent);
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.7); cursor: pointer;
+}
+
+select, input[type="text"], input[type="number"] {
+  width: 100%;
+  padding: 9px 12px;
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+select:focus, input[type="text"]:focus, input[type="number"]:focus {
+  border-color: var(--accent);
+}
+
+/* ---- Buttons ---- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 16px;
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.16s ease;
+  user-select: none;
+}
+.btn:hover { background: var(--bg-3); border-color: var(--line-strong); transform: translateY(-1px); }
+.btn:active { transform: translateY(0); }
+.btn.primary {
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  border: none;
+  color: #04101c;
+  font-weight: 700;
+}
+.btn.primary:hover { box-shadow: 0 8px 24px -6px rgba(56, 189, 248, 0.55); }
+.btn-row { display: flex; gap: 10px; flex-wrap: wrap; }
+
+.chip {
+  font-family: var(--mono);
+  font-size: 11px;
+  padding: 6px 11px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--ink-dim);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.chip:hover { border-color: var(--line-strong); color: #fff; }
+.chip.active {
+  background: rgba(56, 189, 248, 0.14);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+/* ---- Readout / stats ---- */
+.readout {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--ink-dim);
+  display: flex;
+  justify-content: space-between;
+  padding: 5px 0;
+  border-bottom: 1px dashed var(--line);
+}
+.readout:last-child { border-bottom: none; }
+.readout b { color: var(--accent); font-weight: 600; }
+
+.hint { font-size: 12px; color: var(--ink-faint); line-height: 1.6; }
+
+/* ---- Canvas frame ---- */
+canvas { display: block; }
+.stage {
+  position: relative;
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: #000;
+}
+
+/* ---- scrollbars ---- */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(150,170,230,0.16); border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(150,170,230,0.30); }
+
+/* ---- utility ---- */
+.kbd {
+  font-family: var(--mono);
+  font-size: 11px;
+  padding: 2px 7px;
+  border-radius: 6px;
+  border: 1px solid var(--line-strong);
+  background: var(--bg-2);
+  color: var(--ink-dim);
+}
+.grow { flex: 1; }
+.muted { color: var(--ink-faint); }
+</style>
+<style>
+  /* ---- page-local layout (design tokens come from lab.css) ---- */
+  html, body { height: 100%; }
+  body { display: flex; flex-direction: column; overflow: hidden; }
+
+  .lab-main {
+    flex: 1;
+    display: flex;
+    gap: 16px;
+    padding: 16px;
+    min-height: 0;
+  }
+
+  /* control column */
+  .controls {
+    width: 312px;
+    flex: 0 0 312px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    overflow-y: auto;
+    padding-right: 4px;
+  }
+
+  /* arena column */
+  .arena {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-width: 0;
+    min-height: 0;
+  }
+  .arena .stage.landscape {
+    flex: 1;
+    min-height: 0;
+  }
+  .arena .stage.landscape canvas { width: 100%; height: 100%; }
+
+  /* bottom strip: convergence plot + legend */
+  .bottom-strip {
+    display: flex;
+    gap: 14px;
+    flex: 0 0 auto;
+    height: 188px;
+  }
+  .stage.convergence {
+    flex: 1;
+    min-width: 0;
+    position: relative;
+  }
+  .stage.convergence canvas { width: 100%; height: 100%; }
+  .conv-label {
+    position: absolute;
+    top: 10px; left: 14px;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  .panel.legend-panel { flex: 0 0 268px; }
+
+  /* overlay HUD on the landscape */
+  .hud {
+    position: absolute;
+    top: 12px; left: 14px;
+    z-index: 3;
+    pointer-events: none;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ink-dim);
+    text-shadow: 0 1px 6px rgba(0,0,0,0.9);
+  }
+  .hud .fn-name {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: 0.4px;
+  }
+  .hud .fn-formula { color: var(--ink-faint); margin-top: 2px; }
+
+  .status-pill {
+    position: absolute;
+    top: 12px; right: 14px;
+    z-index: 3;
+    pointer-events: none;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 5px 11px;
+    border-radius: 999px;
+    border: 1px solid var(--line-strong);
+    background: rgba(9,11,20,0.55);
+    backdrop-filter: blur(8px);
+    color: var(--ink-faint);
+  }
+  .status-pill.running { color: var(--aurora-lime); border-color: rgba(163,230,53,0.4); }
+  .status-pill.paused  { color: var(--aurora-amber); }
+
+  .seg {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .seg .chip { flex: 1 1 auto; text-align: center; }
+
+  .algo-params { transition: opacity 0.2s ease; }
+  .hidden { display: none !important; }
+
+  .readout b.amber { color: var(--aurora-amber); }
+  .readout b.violet { color: var(--accent-2); }
+
+  .lg-row {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    font-size: 11.5px;
+    color: var(--ink-dim);
+    margin-bottom: 9px;
+  }
+  .lg-row:last-child { margin-bottom: 0; }
+  .lg-dot {
+    width: 12px; height: 12px; border-radius: 50%;
+    flex: 0 0 auto;
+    box-shadow: 0 0 8px currentColor;
+  }
+  .lg-ring {
+    width: 13px; height: 13px; border-radius: 50%;
+    flex: 0 0 auto;
+    border: 2px solid currentColor;
+    box-shadow: 0 0 8px currentColor;
+  }
+
+  .panel-sub {
+    font-size: 11px;
+    color: var(--ink-faint);
+    margin: -8px 0 12px;
+    line-height: 1.5;
+  }
+
+  /* responsive: stack on narrow screens */
+  @media (max-width: 860px) {
+    body { overflow: auto; height: auto; }
+    .lab-main { flex-direction: column; }
+    .controls { width: auto; flex: 0 0 auto; max-height: none; overflow-y: visible; }
+    .arena { flex: 0 0 auto; }
+    /* reset flex so the landscape can't collapse to a 0 basis when the
+       column no longer has a definite height */
+    .arena .stage.landscape { flex: 0 0 auto; height: 56vh; min-height: 360px; }
+    .bottom-strip { flex-direction: column; height: auto; }
+    .stage.convergence { flex: 0 0 auto; height: 180px; }
+    .panel.legend-panel { flex: 0 0 auto; }
+  }
+</style>
+</head>
+<body>
+
+<div class="lab-topbar">
+  <a class="lab-back" href="../../index.html">◀ Sci-Tools</a>
+  <div class="lab-title">Optimizer Arena <span class="dim">/ metaheuristics on 2D landscapes</span></div>
+  <div class="lab-note">↳ the solvers behind my <b>surrogate-assisted CMA-ES / BBOB benchmark</b> &amp; facility-location work</div>
+  <div class="lab-spacer"></div>
+  <div class="lab-tag">PSO · DE · SA · GA</div>
+</div>
+
+<div class="lab-main">
+
+  <!-- ============ CONTROLS ============ -->
+  <div class="controls">
+
+    <div class="panel panel-pad">
+      <div class="panel-title">Objective Function</div>
+      <div class="field" style="margin-bottom:12px">
+        <select id="fnSel"></select>
+      </div>
+      <div class="panel-sub" id="fnDomain"></div>
+      <div class="field">
+        <label>Algorithm</label>
+        <select id="algoSel">
+          <option value="pso">Particle Swarm (PSO)</option>
+          <option value="de">Differential Evolution (DE/rand/1/bin)</option>
+          <option value="sa">Simulated Annealing (SA)</option>
+          <option value="ga">Genetic Algorithm (GA)</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="panel panel-pad">
+      <div class="panel-title">Parameters</div>
+
+      <div class="field">
+        <label>Population / Swarm size <span class="val" id="popVal">40</span></label>
+        <input type="range" id="pop" min="6" max="200" step="1" value="40">
+      </div>
+
+      <div class="field">
+        <label>Speed <span class="val" id="speedVal">2 it/frame</span></label>
+        <input type="range" id="speed" min="1" max="20" step="1" value="2">
+      </div>
+
+      <!-- PSO params -->
+      <div class="algo-params" data-algo="pso">
+        <div class="field">
+          <label>Inertia w <span class="val" id="wVal">0.72</span></label>
+          <input type="range" id="w" min="0" max="1" step="0.01" value="0.72">
+        </div>
+        <div class="field">
+          <label>Cognitive c1 <span class="val" id="c1Val">1.50</span></label>
+          <input type="range" id="c1" min="0" max="3" step="0.05" value="1.5">
+        </div>
+        <div class="field">
+          <label>Social c2 <span class="val" id="c2Val">1.50</span></label>
+          <input type="range" id="c2" min="0" max="3" step="0.05" value="1.5">
+        </div>
+      </div>
+
+      <!-- DE params -->
+      <div class="algo-params hidden" data-algo="de">
+        <div class="field">
+          <label>Differential weight F <span class="val" id="fVal">0.60</span></label>
+          <input type="range" id="f" min="0" max="2" step="0.05" value="0.6">
+        </div>
+        <div class="field">
+          <label>Crossover rate CR <span class="val" id="crVal">0.90</span></label>
+          <input type="range" id="cr" min="0" max="1" step="0.01" value="0.9">
+        </div>
+      </div>
+
+      <!-- SA params -->
+      <div class="algo-params hidden" data-algo="sa">
+        <div class="field">
+          <label>Initial temperature T₀ <span class="val" id="t0Val">8.0</span></label>
+          <input type="range" id="t0" min="0.1" max="40" step="0.1" value="8">
+        </div>
+        <div class="field">
+          <label>Cooling rate α <span class="val" id="alphaVal">0.985</span></label>
+          <input type="range" id="alpha" min="0.90" max="0.999" step="0.001" value="0.985">
+        </div>
+        <div class="field">
+          <label>Step scale (× domain) <span class="val" id="saStepVal">0.06</span></label>
+          <input type="range" id="saStep" min="0.005" max="0.3" step="0.005" value="0.06">
+        </div>
+      </div>
+
+      <!-- GA params -->
+      <div class="algo-params hidden" data-algo="ga">
+        <div class="field">
+          <label>Mutation rate <span class="val" id="mrVal">0.20</span></label>
+          <input type="range" id="mr" min="0" max="1" step="0.01" value="0.2">
+        </div>
+        <div class="field">
+          <label>Mutation scale (× domain) <span class="val" id="msVal">0.10</span></label>
+          <input type="range" id="ms" min="0.005" max="0.4" step="0.005" value="0.1">
+        </div>
+        <div class="field">
+          <label>Tournament size <span class="val" id="tkVal">3</span></label>
+          <input type="range" id="tk" min="2" max="8" step="1" value="3">
+        </div>
+      </div>
+    </div>
+
+    <div class="panel panel-pad">
+      <div class="panel-title">Run</div>
+      <div class="btn-row">
+        <button class="btn primary grow" id="playBtn">▶ Play</button>
+        <button class="btn" id="stepBtn">Step</button>
+        <button class="btn" id="resetBtn">↻ Reset</button>
+      </div>
+      <div class="field" style="margin-top:14px;margin-bottom:0">
+        <label style="margin-bottom:4px">View</label>
+        <div class="seg">
+          <button class="chip active" id="trailsChip">Trails</button>
+          <button class="chip active" id="contoursChip">Contours</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ============ ARENA ============ -->
+  <div class="arena">
+
+    <div class="stage landscape">
+      <div class="hud">
+        <div class="fn-name" id="hudName">Rastrigin</div>
+        <div class="fn-formula" id="hudFormula"></div>
+      </div>
+      <div class="status-pill paused" id="statusPill">paused</div>
+      <canvas id="land"></canvas>
+    </div>
+
+    <div class="bottom-strip">
+      <div class="stage convergence">
+        <div class="conv-label">Best-so-far fitness (log) vs iteration</div>
+        <canvas id="conv"></canvas>
+      </div>
+
+      <div class="panel panel-pad legend-panel">
+        <div class="panel-title">Live Telemetry</div>
+        <div class="readout"><span>iteration</span><b id="roIter">0</b></div>
+        <div class="readout"><span>best fitness</span><b class="amber" id="roBest">—</b></div>
+        <div class="readout"><span>best x</span><b id="roBx">—</b></div>
+        <div class="readout"><span>best y</span><b id="roBy">—</b></div>
+        <div class="readout"><span>mean fitness</span><b class="violet" id="roMean">—</b></div>
+        <div class="readout"><span id="roExtraLbl">—</span><b id="roExtra">—</b></div>
+
+        <div style="margin-top:14px">
+          <div class="lg-row" style="color:var(--aurora-amber)"><span class="lg-ring"></span><span style="color:var(--ink-dim)">global best particle</span></div>
+          <div class="lg-row" style="color:var(--aurora-cyan)"><span class="lg-dot"></span><span style="color:var(--ink-dim)">population members</span></div>
+          <div class="lg-row" style="color:var(--ink)"><span class="lg-ring" style="border-style:dashed"></span><span style="color:var(--ink-dim)">known optimum</span></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- a hidden hint surfaced under the arena on wide screens -->
+<div class="hint" id="hintBar" style="padding:0 16px 12px;max-width:980px"></div>
+
+<script>
+"use strict";
+/* ============================================================
+   Optimizer Arena — metaheuristics on 2D landscapes
+   All math is textbook-standard. Minimization throughout.
+   ============================================================ */
+
+// ---------- tiny utilities ----------
+const TAU = Math.PI * 2;
+const rand = (a, b) => a + Math.random() * (b - a);
+const clamp = (v, lo, hi) => v < lo ? lo : (v > hi ? hi : v);
+// Standard normal via Box–Muller
+function randn() {
+  let u = 0, v = 0;
+  while (u === 0) u = Math.random();
+  while (v === 0) v = Math.random();
+  return Math.sqrt(-2 * Math.log(u)) * Math.cos(TAU * v);
+}
+
+// ============================================================
+//  OBJECTIVE FUNCTIONS  (each minimization, with known optima)
+//  domain: [lo, hi] applied to both x and y.
+// ============================================================
+const FUNCTIONS = {
+  sphere: {
+    name: "Sphere",
+    formula: "f = x² + y²",
+    lo: -5.12, hi: 5.12,
+    fmin: 0,
+    optima: [[0, 0]],
+    f: (x, y) => x * x + y * y
+  },
+  rastrigin: {
+    name: "Rastrigin",
+    formula: "f = 20 + Σ[xᵢ² − 10cos(2πxᵢ)]",
+    lo: -5.12, hi: 5.12,
+    fmin: 0,
+    optima: [[0, 0]],
+    f: (x, y) =>
+      20 + (x * x - 10 * Math.cos(TAU * x)) + (y * y - 10 * Math.cos(TAU * y))
+  },
+  ackley: {
+    name: "Ackley",
+    formula: "f = −20e^(−0.2√(½(x²+y²))) − e^(½(cos2πx+cos2πy)) + 20 + e",
+    lo: -5.12, hi: 5.12,
+    fmin: 0,
+    optima: [[0, 0]],
+    f: (x, y) => {
+      const a = 20, b = 0.2, c = TAU;
+      const s1 = 0.5 * (x * x + y * y);
+      const s2 = 0.5 * (Math.cos(c * x) + Math.cos(c * y));
+      return -a * Math.exp(-b * Math.sqrt(s1)) - Math.exp(s2) + a + Math.E;
+    }
+  },
+  rosenbrock: {
+    name: "Rosenbrock",
+    formula: "f = 100(y − x²)² + (1 − x)²",
+    lo: -2, hi: 2,
+    fmin: 0,
+    optima: [[1, 1]],
+    f: (x, y) => {
+      const t = (y - x * x);
+      const u = (1 - x);
+      return 100 * t * t + u * u;
+    }
+  },
+  himmelblau: {
+    name: "Himmelblau",
+    formula: "f = (x²+y−11)² + (x+y²−7)²",
+    lo: -5, hi: 5,
+    fmin: 0,
+    optima: [
+      [3, 2],
+      [-2.805118, 3.131312],
+      [-3.779310, -3.283186],
+      [3.584428, -1.848126]
+    ],
+    f: (x, y) => {
+      const a = (x * x + y - 11);
+      const b = (x + y * y - 7);
+      return a * a + b * b;
+    }
+  },
+  schwefel: {
+    name: "Schwefel",
+    formula: "f = 418.9829·n − Σ xᵢ·sin(√|xᵢ|)",
+    lo: -500, hi: 500,
+    fmin: 0,
+    optima: [[420.9687, 420.9687]],
+    f: (x, y) =>
+      418.9829 * 2
+      - (x * Math.sin(Math.sqrt(Math.abs(x))))
+      - (y * Math.sin(Math.sqrt(Math.abs(y))))
+  },
+  eggholder: {
+    name: "Eggholder",
+    formula: "f = −(y+47)sin√|x/2+y+47| − x·sin√|x−(y+47)|",
+    lo: -512, hi: 512,
+    fmin: -959.6407,           // known global minimum value
+    optima: [[512, 404.2319]], // known global minimizer
+    f: (x, y) => {
+      const t1 = -(y + 47) * Math.sin(Math.sqrt(Math.abs(x / 2 + (y + 47))));
+      const t2 = -x * Math.sin(Math.sqrt(Math.abs(x - (y + 47))));
+      return t1 + t2;
+    }
+  }
+};
+const FN_ORDER = ["rastrigin", "ackley", "rosenbrock", "sphere", "himmelblau", "schwefel", "eggholder"];
+
+const HINTS = {
+  rastrigin: "Rastrigin is a minefield of local minima on a smooth bowl — watch a healthy swarm tunnel through the egg-carton ripples to the single global optimum at the origin.",
+  ackley: "Ackley is nearly flat far out, then plunges sharply at the center. Algorithms that explore widely find the funnel; greedy ones can stall on the plateau.",
+  rosenbrock: "Rosenbrock's banana valley is easy to enter but the floor barely slopes toward (1,1). Watch how slowly best-fitness crawls — classic ill-conditioning.",
+  sphere: "Sphere is the trivial convex bowl: every algorithm should converge cleanly to the origin. Use it as a sanity check on your hyperparameters.",
+  himmelblau: "Himmelblau has four equal global minima. Notice the swarm split or commit — different runs settle on different basins.",
+  schwefel: "Schwefel's optimum sits in a far corner near (421,421), deceptively distant from the deep-looking trap at the center. Exploration matters here.",
+  eggholder: "Eggholder is brutally rugged with the global minimum jammed against the boundary at (512,404). Expect noisy convergence and frequent re-ranking."
+};
+
+// ============================================================
+//  COLORMAP — viridis-like (perceptually-ordered), precomputed
+// ============================================================
+const VIRIDIS = [
+  [68, 1, 84],[71, 13, 96],[72, 24, 106],[72, 35, 116],[71, 45, 123],
+  [69, 55, 129],[66, 64, 134],[62, 73, 137],[59, 82, 139],[55, 91, 141],
+  [51, 99, 141],[47, 107, 142],[44, 114, 142],[41, 122, 142],[38, 130, 142],
+  [35, 137, 142],[33, 145, 140],[31, 152, 139],[31, 160, 136],[34, 167, 133],
+  [40, 174, 128],[50, 182, 122],[63, 188, 115],[80, 196, 106],[99, 201, 95],
+  [119, 207, 85],[141, 211, 72],[164, 215, 60],[187, 219, 47],[210, 222, 39],
+  [233, 224, 34],[253, 231, 37]
+];
+function viridis(t) {
+  t = clamp(t, 0, 1);
+  const x = t * (VIRIDIS.length - 1);
+  const i = Math.floor(x);
+  const fr = x - i;
+  const a = VIRIDIS[i];
+  const b = VIRIDIS[Math.min(i + 1, VIRIDIS.length - 1)];
+  return [
+    a[0] + (b[0] - a[0]) * fr,
+    a[1] + (b[1] - a[1]) * fr,
+    a[2] + (b[2] - a[2]) * fr
+  ];
+}
+
+// ============================================================
+//  STATE
+// ============================================================
+const land = document.getElementById('land');
+const lctx = land.getContext('2d');
+const conv = document.getElementById('conv');
+const cctx = conv.getContext('2d');
+
+let DPR = Math.min(window.devicePixelRatio || 1, 2);
+let LW = 0, LH = 0;     // landscape canvas pixel size (device px)
+let CW = 0, CH = 0;     // convergence canvas pixel size (device px)
+
+let fnKey = "rastrigin";
+let algoKey = "pso";
+
+let heatCanvas = document.createElement('canvas');
+let heatCtx = heatCanvas.getContext('2d');
+let fieldMin = 0, fieldMax = 1;     // value range over the rendered grid
+let heatDirty = true;
+
+let running = false;
+let iter = 0;
+let bestFit = Infinity;
+let bestPos = [0, 0];
+let meanFit = 0;
+let convHistory = [];   // best-so-far per iteration
+
+// population structures (per-algorithm fields filled at reset)
+let pop = [];           // array of {x,y, ...algo state, trail:[]}
+let optimizer = null;   // {step(): void} bound to current algo
+
+// controls cache
+const els = {};
+[
+  'fnSel','algoSel','pop','popVal','speed','speedVal',
+  'w','wVal','c1','c1Val','c2','c2Val',
+  'f','fVal','cr','crVal',
+  't0','t0Val','alpha','alphaVal','saStep','saStepVal',
+  'mr','mrVal','ms','msVal','tk','tkVal',
+  'playBtn','stepBtn','resetBtn','trailsChip','contoursChip',
+  'hudName','hudFormula','statusPill','fnDomain','hintBar',
+  'roIter','roBest','roBx','roBy','roMean','roExtra','roExtraLbl'
+].forEach(id => els[id] = document.getElementById(id));
+
+let showTrails = true;
+let showContours = true;
+const TRAIL_LEN = 14;
+
+// ============================================================
+//  COORDINATE MAPPING  (objective-space <-> canvas pixels)
+//  y is flipped so +y (objective) points UP on screen.
+// ============================================================
+function P() { return FUNCTIONS[fnKey]; }
+function objToPx(x, y) {
+  const fn = P();
+  const u = (x - fn.lo) / (fn.hi - fn.lo);
+  const v = (y - fn.lo) / (fn.hi - fn.lo);
+  return [u * LW, (1 - v) * LH];
+}
+
+// ============================================================
+//  HEATMAP (cached ImageData), recomputed on fn/size change
+// ============================================================
+function buildHeatmap() {
+  const fn = P();
+  // Render at a moderate grid then scale up — fast & smooth.
+  const GW = Math.max(2, Math.min(420, Math.round(LW / 2)));
+  const GH = Math.max(2, Math.min(420, Math.round(LH / 2)));
+  heatCanvas.width = GW;
+  heatCanvas.height = GH;
+
+  // First pass: evaluate field, track min/max for normalization.
+  const vals = new Float64Array(GW * GH);
+  let vmin = Infinity, vmax = -Infinity;
+  for (let j = 0; j < GH; j++) {
+    // pixel-center sampling; row 0 is top => high y
+    const y = fn.lo + (fn.hi - fn.lo) * (1 - (j + 0.5) / GH);
+    for (let i = 0; i < GW; i++) {
+      const x = fn.lo + (fn.hi - fn.lo) * ((i + 0.5) / GW);
+      const z = fn.f(x, y);
+      vals[j * GW + i] = z;
+      if (z < vmin) vmin = z;
+      if (z > vmax) vmax = z;
+    }
+  }
+  fieldMin = vmin; fieldMax = vmax;
+  const span = (vmax - vmin) || 1;
+
+  // Second pass: colorize. Use a gentle nonlinearity (sqrt) so the
+  // basins near the optimum stay visible on wide-range functions.
+  const img = heatCtx.createImageData(GW, GH);
+  const data = img.data;
+  for (let k = 0; k < vals.length; k++) {
+    let t = (vals[k] - vmin) / span;        // 0 = best (min), 1 = worst
+    t = Math.sqrt(t);                        // emphasize low region
+    // invert so the MINIMUM is bright/yellow, maximum is deep violet:
+    const c = viridis(1 - t);
+    const o = k * 4;
+    data[o] = c[0]; data[o + 1] = c[1]; data[o + 2] = c[2]; data[o + 3] = 255;
+  }
+  heatCtx.putImageData(img, 0, 0);
+  heatDirty = false;
+}
+
+// contour overlay drawn directly to landscape ctx using the heat grid
+function drawContours() {
+  const fn = P();
+  const span = (fieldMax - fieldMin) || 1;
+  const levels = 7;
+  lctx.save();
+  lctx.lineWidth = 1;
+  lctx.strokeStyle = 'rgba(255,255,255,0.10)';
+  // marching-squares-lite: sample on a coarse grid and stroke iso-cells
+  const N = 110;
+  for (let li = 1; li <= levels; li++) {
+    // nonlinear level placement to match the sqrt colormap
+    const tf = li / (levels + 1);
+    const level = fieldMin + span * (tf * tf);
+    lctx.beginPath();
+    for (let j = 0; j < N; j++) {
+      const y0 = fn.lo + (fn.hi - fn.lo) * (1 - j / N);
+      const y1 = fn.lo + (fn.hi - fn.lo) * (1 - (j + 1) / N);
+      for (let i = 0; i < N; i++) {
+        const x0 = fn.lo + (fn.hi - fn.lo) * (i / N);
+        const x1 = fn.lo + (fn.hi - fn.lo) * ((i + 1) / N);
+        const a = fn.f(x0, y0), b = fn.f(x1, y0);
+        const c = fn.f(x0, y1), d = fn.f(x1, y1);
+        // detect crossing along the top and left edges of the cell
+        if ((a - level) * (b - level) < 0) {
+          const t = (level - a) / (b - a);
+          const xx = x0 + (x1 - x0) * t;
+          const [px, py] = objToPx(xx, y0);
+          lctx.moveTo(px, py); lctx.lineTo(px, py + 0.01);
+        }
+        if ((a - level) * (c - level) < 0) {
+          const t = (level - a) / (c - a);
+          const yy = y0 + (y1 - y0) * t;
+          const [px, py] = objToPx(x0, yy);
+          lctx.moveTo(px, py); lctx.lineTo(px + 0.01, py);
+        }
+      }
+    }
+    lctx.stroke();
+  }
+  lctx.restore();
+}
+
+// ============================================================
+//  POPULATION INITIALIZATION
+// ============================================================
+function newMember() {
+  const fn = P();
+  const x = rand(fn.lo, fn.hi);
+  const y = rand(fn.lo, fn.hi);
+  return { x, y, trail: [] };
+}
+
+function resetPopulation() {
+  const fn = P();
+  const n = +els.pop.value;
+  pop = [];
+  bestFit = Infinity;
+  bestPos = [0, 0];
+  iter = 0;
+  convHistory = [];
+
+  for (let i = 0; i < n; i++) {
+    const m = newMember();
+    m.fit = fn.f(m.x, m.y);
+    pop.push(m);
+  }
+
+  // algorithm-specific extra state
+  if (algoKey === 'pso') {
+    for (const m of pop) {
+      const vrange = (fn.hi - fn.lo);
+      m.vx = rand(-0.1 * vrange, 0.1 * vrange);
+      m.vy = rand(-0.1 * vrange, 0.1 * vrange);
+      m.pbx = m.x; m.pby = m.y; m.pbest = m.fit;
+    }
+  } else if (algoKey === 'sa') {
+    saT = +els.t0.value;          // global temperature (geometric cooling)
+    for (const m of pop) { m.cx = m.x; m.cy = m.y; m.cfit = m.fit; } // current accepted state
+  }
+
+  // seed global best
+  for (const m of pop) {
+    if (m.fit < bestFit) { bestFit = m.fit; bestPos = [m.x, m.y]; }
+  }
+  recordConvergence();
+  buildOptimizer();
+  updateReadouts();
+}
+
+function pushTrail(m) {
+  if (!showTrails) return;
+  m.trail.push([m.x, m.y]);
+  if (m.trail.length > TRAIL_LEN) m.trail.shift();
+}
+
+// ============================================================
+//  ALGORITHMS  (each exposes step() advancing ONE iteration)
+//  All operate on the shared `pop` array & update bestFit/bestPos.
+// ============================================================
+let saT = 1;   // SA temperature
+
+function buildOptimizer() {
+  if (algoKey === 'pso') optimizer = stepPSO;
+  else if (algoKey === 'de') optimizer = stepDE;
+  else if (algoKey === 'sa') optimizer = stepSA;
+  else optimizer = stepGA;
+}
+
+function commitGlobalBest() {
+  let sum = 0;
+  for (const m of pop) {
+    sum += m.fit;
+    if (m.fit < bestFit) { bestFit = m.fit; bestPos = [m.x, m.y]; }
+  }
+  meanFit = sum / pop.length;
+}
+
+// ---- PSO: v = w·v + c1·r1·(pbest−x) + c2·r2·(gbest−x) ----
+function stepPSO() {
+  const fn = P();
+  const w = +els.w.value, c1 = +els.c1.value, c2 = +els.c2.value;
+  const vmax = 0.2 * (fn.hi - fn.lo);   // velocity clamp for stability
+  const gbx = bestPos[0], gby = bestPos[1];
+  for (const m of pop) {
+    const r1 = Math.random(), r2 = Math.random();
+    const r3 = Math.random(), r4 = Math.random();
+    m.vx = w * m.vx + c1 * r1 * (m.pbx - m.x) + c2 * r2 * (gbx - m.x);
+    m.vy = w * m.vy + c1 * r3 * (m.pby - m.y) + c2 * r4 * (gby - m.y);
+    m.vx = clamp(m.vx, -vmax, vmax);
+    m.vy = clamp(m.vy, -vmax, vmax);
+    pushTrail(m);
+    m.x = clamp(m.x + m.vx, fn.lo, fn.hi);
+    m.y = clamp(m.y + m.vy, fn.lo, fn.hi);
+    m.fit = fn.f(m.x, m.y);
+    if (m.fit < m.pbest) { m.pbest = m.fit; m.pbx = m.x; m.pby = m.y; }
+  }
+  commitGlobalBest();
+}
+
+// ---- DE/rand/1/bin: v = a + F·(b−c), binomial CX, greedy select ----
+function stepDE() {
+  const fn = P();
+  const F = +els.f.value, CR = +els.cr.value;
+  const n = pop.length;
+  const trial = new Array(n);
+  for (let i = 0; i < n; i++) {
+    // pick 3 distinct indices != i
+    let a, b, c;
+    do { a = (Math.random() * n) | 0; } while (a === i);
+    do { b = (Math.random() * n) | 0; } while (b === i || b === a);
+    do { c = (Math.random() * n) | 0; } while (c === i || c === a || c === b);
+    const A = pop[a], B = pop[b], C = pop[c], X = pop[i];
+    // mutant
+    const mx = A.x + F * (B.x - C.x);
+    const my = A.y + F * (B.y - C.y);
+    // binomial crossover — ensure at least one dimension comes from mutant (jrand)
+    const jrand = (Math.random() * 2) | 0;
+    let tx = X.x, ty = X.y;
+    if (Math.random() < CR || jrand === 0) tx = mx;
+    if (Math.random() < CR || jrand === 1) ty = my;
+    tx = clamp(tx, fn.lo, fn.hi);
+    ty = clamp(ty, fn.lo, fn.hi);
+    trial[i] = { x: tx, y: ty, fit: fn.f(tx, ty) };
+  }
+  // greedy selection
+  for (let i = 0; i < n; i++) {
+    const X = pop[i], T = trial[i];
+    if (T.fit <= X.fit) {
+      pushTrail(X);
+      X.x = T.x; X.y = T.y; X.fit = T.fit;
+    }
+  }
+  commitGlobalBest();
+}
+
+// ---- SA: independent walkers, Metropolis accept, geometric cooling ----
+function stepSA() {
+  const fn = P();
+  const alpha = +els.alpha.value;
+  const stepScale = +els.saStep.value * (fn.hi - fn.lo);
+  const T = Math.max(saT, 1e-9);
+  for (const m of pop) {
+    // propose Gaussian neighbour from current accepted state
+    const nx = clamp(m.cx + randn() * stepScale, fn.lo, fn.hi);
+    const ny = clamp(m.cy + randn() * stepScale, fn.lo, fn.hi);
+    const nf = fn.f(nx, ny);
+    const dE = nf - m.cfit;
+    if (dE <= 0 || Math.random() < Math.exp(-dE / T)) {
+      pushTrail(m);
+      m.cx = nx; m.cy = ny; m.cfit = nf;
+    }
+    // visible position tracks the accepted/current state
+    m.x = m.cx; m.y = m.cy; m.fit = m.cfit;
+  }
+  saT = saT * alpha;     // geometric cooling T <- αT
+  commitGlobalBest();
+}
+
+// ---- GA: tournament select, blend (BLX-ish arithmetic) CX, Gaussian mutation ----
+function tournament(k) {
+  let best = pop[(Math.random() * pop.length) | 0];
+  for (let t = 1; t < k; t++) {
+    const cand = pop[(Math.random() * pop.length) | 0];
+    if (cand.fit < best.fit) best = cand;
+  }
+  return best;
+}
+function stepGA() {
+  const fn = P();
+  const mr = +els.mr.value;
+  const ms = +els.ms.value * (fn.hi - fn.lo);
+  const k = +els.tk.value;
+  const n = pop.length;
+  const next = new Array(n);
+
+  // elitism: carry the current best forward
+  let eliteIdx = 0;
+  for (let i = 1; i < n; i++) if (pop[i].fit < pop[eliteIdx].fit) eliteIdx = i;
+  const elite = pop[eliteIdx];
+  next[0] = { x: elite.x, y: elite.y, trail: elite.trail, fit: elite.fit };
+
+  for (let i = 1; i < n; i++) {
+    const p1 = tournament(k), p2 = tournament(k);
+    // arithmetic / blend crossover
+    const beta = rand(-0.25, 1.25);    // BLX-style spread
+    let cx = p1.x + beta * (p2.x - p1.x);
+    let cy = p1.y + beta * (p2.y - p1.y);
+    // Gaussian mutation per gene
+    if (Math.random() < mr) cx += randn() * ms;
+    if (Math.random() < mr) cy += randn() * ms;
+    cx = clamp(cx, fn.lo, fn.hi);
+    cy = clamp(cy, fn.lo, fn.hi);
+    next[i] = { x: cx, y: cy, trail: [], fit: fn.f(cx, cy) };
+  }
+  // carry trails for stability of visualization on survivors near old positions
+  for (let i = 0; i < n; i++) {
+    if (!next[i].trail) next[i].trail = [];
+    pushTrail(next[i]);
+  }
+  pop = next;
+  commitGlobalBest();
+}
+
+// ============================================================
+//  ONE SIMULATION ITERATION
+// ============================================================
+function recordConvergence() {
+  convHistory.push(bestFit);
+  if (convHistory.length > 4000) convHistory.shift();
+}
+function iterate() {
+  optimizer();
+  iter++;
+  recordConvergence();
+}
+
+// ============================================================
+//  RENDERING
+// ============================================================
+function radiusFor(n) {
+  // smaller dots for big populations
+  return clamp(7 - Math.log2(n) * 0.55, 2.4, 6);
+}
+
+function drawLandscape() {
+  // blit cached heatmap, scaled to full canvas
+  lctx.imageSmoothingEnabled = true;
+  lctx.clearRect(0, 0, LW, LH);
+  lctx.drawImage(heatCanvas, 0, 0, heatCanvas.width, heatCanvas.height, 0, 0, LW, LH);
+
+  if (showContours) drawContours();
+
+  const fn = P();
+
+  // ---- known optima markers (dashed rings) ----
+  lctx.save();
+  lctx.setLineDash([4, 3]);
+  lctx.lineWidth = 1.5;
+  for (const [ox, oy] of fn.optima) {
+    const [px, py] = objToPx(ox, oy);
+    lctx.beginPath();
+    lctx.strokeStyle = 'rgba(232,236,248,0.85)';
+    lctx.arc(px, py, 9, 0, TAU);
+    lctx.stroke();
+    // crosshair
+    lctx.beginPath();
+    lctx.moveTo(px - 13, py); lctx.lineTo(px - 4, py);
+    lctx.moveTo(px + 4, py); lctx.lineTo(px + 13, py);
+    lctx.moveTo(px, py - 13); lctx.lineTo(px, py - 4);
+    lctx.moveTo(px, py + 4); lctx.lineTo(px, py + 13);
+    lctx.stroke();
+  }
+  lctx.restore();
+
+  // ---- trails ----
+  if (showTrails) {
+    lctx.save();
+    lctx.lineWidth = 1.2;
+    lctx.lineCap = 'round';
+    for (const m of pop) {
+      const tr = m.trail;
+      if (!tr || tr.length < 2) continue;
+      for (let i = 1; i < tr.length; i++) {
+        const a = objToPx(tr[i - 1][0], tr[i - 1][1]);
+        const b = objToPx(tr[i][0], tr[i][1]);
+        const alpha = (i / tr.length) * 0.45;
+        lctx.strokeStyle = 'rgba(56,189,248,' + alpha.toFixed(3) + ')';
+        lctx.beginPath();
+        lctx.moveTo(a[0], a[1]);
+        lctx.lineTo(b[0], b[1]);
+        lctx.stroke();
+      }
+    }
+    lctx.restore();
+  }
+
+  // ---- population dots (glowing) ----
+  const r = radiusFor(pop.length);
+  lctx.save();
+  lctx.globalCompositeOperation = 'lighter';
+  for (const m of pop) {
+    const [px, py] = objToPx(m.x, m.y);
+    const g = lctx.createRadialGradient(px, py, 0, px, py, r * 2.6);
+    g.addColorStop(0, 'rgba(125,225,255,0.95)');
+    g.addColorStop(0.4, 'rgba(56,189,248,0.55)');
+    g.addColorStop(1, 'rgba(56,189,248,0)');
+    lctx.fillStyle = g;
+    lctx.beginPath();
+    lctx.arc(px, py, r * 2.6, 0, TAU);
+    lctx.fill();
+  }
+  lctx.restore();
+
+  // crisp cores
+  lctx.save();
+  for (const m of pop) {
+    const [px, py] = objToPx(m.x, m.y);
+    lctx.fillStyle = 'rgba(224,247,255,0.92)';
+    lctx.beginPath();
+    lctx.arc(px, py, r * 0.62, 0, TAU);
+    lctx.fill();
+  }
+  lctx.restore();
+
+  // ---- global-best particle: larger amber dot + ring ----
+  if (isFinite(bestFit)) {
+    const [px, py] = objToPx(bestPos[0], bestPos[1]);
+    lctx.save();
+    lctx.globalCompositeOperation = 'lighter';
+    const g = lctx.createRadialGradient(px, py, 0, px, py, 22);
+    g.addColorStop(0, 'rgba(255,221,128,0.95)');
+    g.addColorStop(0.45, 'rgba(251,191,36,0.5)');
+    g.addColorStop(1, 'rgba(251,191,36,0)');
+    lctx.fillStyle = g;
+    lctx.beginPath(); lctx.arc(px, py, 22, 0, TAU); lctx.fill();
+    lctx.restore();
+
+    lctx.save();
+    lctx.fillStyle = '#fff7e0';
+    lctx.beginPath(); lctx.arc(px, py, r * 0.95 + 1.5, 0, TAU); lctx.fill();
+    lctx.strokeStyle = 'rgba(251,191,36,0.95)';
+    lctx.lineWidth = 2;
+    lctx.beginPath(); lctx.arc(px, py, r * 0.95 + 5, 0, TAU); lctx.stroke();
+    lctx.restore();
+  }
+}
+
+function drawConvergence() {
+  cctx.clearRect(0, 0, CW, CH);
+  const padL = 46, padR = 12, padT = 14, padB = 22;
+  const plotW = CW - padL - padR;
+  const plotH = CH - padT - padB;
+  if (plotW <= 0 || plotH <= 0) return;
+
+  const fn = P();
+  const offset = 1e-9;
+  // plot (best-so-far − fmin + offset) on log scale → approaches offset at optimum.
+  const data = convHistory;
+  const n = data.length;
+
+  // y-range in log space
+  const ys = [];
+  let ymin = Infinity, ymax = -Infinity;
+  for (let i = 0; i < n; i++) {
+    let v = data[i] - fn.fmin + offset;
+    if (v < offset) v = offset;
+    const ly = Math.log10(v);
+    ys.push(ly);
+    if (ly < ymin) ymin = ly;
+    if (ly > ymax) ymax = ly;
+  }
+  if (!isFinite(ymin) || !isFinite(ymax)) { ymin = -3; ymax = 1; }
+  if (ymax - ymin < 1e-6) { ymin -= 1; ymax += 1; }
+  const padFrac = 0.08 * (ymax - ymin);
+  ymin -= padFrac; ymax += padFrac;
+
+  const xN = Math.max(1, n - 1);
+  const X = i => padL + (i / xN) * plotW;
+  const Y = ly => padT + (1 - (ly - ymin) / (ymax - ymin)) * plotH;
+
+  // grid + log decade lines
+  cctx.save();
+  cctx.font = '10px ' + getComputedStyle(document.body).getPropertyValue('--mono');
+  cctx.textBaseline = 'middle';
+  cctx.strokeStyle = 'rgba(150,170,230,0.08)';
+  cctx.fillStyle = 'rgba(107,116,143,0.9)';
+  cctx.lineWidth = 1;
+  const decTop = Math.ceil(ymax);
+  const decBot = Math.floor(ymin);
+  for (let d = decBot; d <= decTop; d++) {
+    if (d < ymin || d > ymax) continue;
+    const yy = Y(d);
+    cctx.beginPath();
+    cctx.moveTo(padL, yy); cctx.lineTo(padL + plotW, yy);
+    cctx.stroke();
+    let lbl = (d === 0) ? '1' : ('1e' + d);
+    cctx.textAlign = 'right';
+    cctx.fillText(lbl, padL - 6, yy);
+  }
+  // axis baseline
+  cctx.strokeStyle = 'rgba(150,170,230,0.18)';
+  cctx.beginPath();
+  cctx.moveTo(padL, padT); cctx.lineTo(padL, padT + plotH);
+  cctx.lineTo(padL + plotW, padT + plotH);
+  cctx.stroke();
+  cctx.restore();
+
+  if (n < 2) return;
+
+  // area fill under curve
+  cctx.save();
+  const grad = cctx.createLinearGradient(0, padT, 0, padT + plotH);
+  grad.addColorStop(0, 'rgba(167,139,250,0.30)');
+  grad.addColorStop(1, 'rgba(56,189,248,0.02)');
+  cctx.fillStyle = grad;
+  cctx.beginPath();
+  cctx.moveTo(X(0), Y(ys[0]));
+  for (let i = 1; i < n; i++) cctx.lineTo(X(i), Y(ys[i]));
+  cctx.lineTo(X(n - 1), padT + plotH);
+  cctx.lineTo(X(0), padT + plotH);
+  cctx.closePath();
+  cctx.fill();
+  cctx.restore();
+
+  // the curve
+  cctx.save();
+  cctx.lineWidth = 2;
+  cctx.lineJoin = 'round';
+  const lg = cctx.createLinearGradient(padL, 0, padL + plotW, 0);
+  lg.addColorStop(0, '#a78bfa');
+  lg.addColorStop(1, '#38bdf8');
+  cctx.strokeStyle = lg;
+  cctx.shadowColor = 'rgba(56,189,248,0.6)';
+  cctx.shadowBlur = 8;
+  cctx.beginPath();
+  cctx.moveTo(X(0), Y(ys[0]));
+  for (let i = 1; i < n; i++) cctx.lineTo(X(i), Y(ys[i]));
+  cctx.stroke();
+  cctx.restore();
+
+  // head marker
+  cctx.save();
+  cctx.fillStyle = '#fbbf24';
+  cctx.shadowColor = 'rgba(251,191,36,0.9)';
+  cctx.shadowBlur = 10;
+  cctx.beginPath();
+  cctx.arc(X(n - 1), Y(ys[n - 1]), 3.2, 0, TAU);
+  cctx.fill();
+  cctx.restore();
+}
+
+// ============================================================
+//  READOUTS
+// ============================================================
+function fmt(v, p = 4) {
+  if (!isFinite(v)) return '—';
+  const a = Math.abs(v);
+  if (a !== 0 && (a < 1e-3 || a >= 1e6)) return v.toExponential(2);
+  return v.toFixed(p);
+}
+function updateReadouts() {
+  els.roIter.textContent = iter;
+  els.roBest.textContent = fmt(bestFit, 5);
+  els.roBx.textContent = fmt(bestPos[0], 4);
+  els.roBy.textContent = fmt(bestPos[1], 4);
+  els.roMean.textContent = fmt(meanFit, 4);
+
+  if (algoKey === 'sa') {
+    els.roExtraLbl.textContent = 'temperature';
+    els.roExtra.textContent = fmt(saT, 4);
+  } else if (algoKey === 'pso') {
+    els.roExtraLbl.textContent = 'swarm size';
+    els.roExtra.textContent = pop.length;
+  } else {
+    els.roExtraLbl.textContent = 'population';
+    els.roExtra.textContent = pop.length;
+  }
+}
+
+// ============================================================
+//  MAIN LOOP
+// ============================================================
+let rafId = null;
+function frame() {
+  if (running) {
+    const speed = +els.speed.value;
+    for (let s = 0; s < speed; s++) iterate();
+    meanFit = meanFit; // already set by commitGlobalBest
+    updateReadouts();
+  }
+  if (heatDirty) buildHeatmap();
+  drawLandscape();
+  drawConvergence();
+  rafId = requestAnimationFrame(frame);
+}
+
+// ============================================================
+//  SIZING
+// ============================================================
+function resize() {
+  DPR = Math.min(window.devicePixelRatio || 1, 2);
+
+  const lr = land.parentElement.getBoundingClientRect();
+  LW = Math.max(2, Math.round(lr.width));
+  LH = Math.max(2, Math.round(lr.height));
+  land.width = Math.round(LW * DPR);
+  land.height = Math.round(LH * DPR);
+  land.style.width = LW + 'px';
+  land.style.height = LH + 'px';
+  lctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+
+  const cr = conv.parentElement.getBoundingClientRect();
+  CW = Math.max(2, Math.round(cr.width));
+  CH = Math.max(2, Math.round(cr.height));
+  conv.width = Math.round(CW * DPR);
+  conv.height = Math.round(CH * DPR);
+  conv.style.width = CW + 'px';
+  conv.style.height = CH + 'px';
+  cctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+
+  heatDirty = true;
+}
+
+// ============================================================
+//  UI WIRING
+// ============================================================
+function setStatus() {
+  els.statusPill.textContent = running ? 'running' : 'paused';
+  els.statusPill.className = 'status-pill ' + (running ? 'running' : 'paused');
+  els.playBtn.textContent = running ? '❚❚ Pause' : '▶ Play';
+}
+function setRunning(v) { running = v; setStatus(); }
+
+function showAlgoParams() {
+  document.querySelectorAll('.algo-params').forEach(el => {
+    el.classList.toggle('hidden', el.getAttribute('data-algo') !== algoKey);
+  });
+}
+
+function applyFunction() {
+  const fn = P();
+  els.hudName.textContent = fn.name;
+  els.hudFormula.textContent = fn.formula;
+  els.fnDomain.textContent =
+    'domain [' + fn.lo + ', ' + fn.hi + ']² · global min f = ' + fn.fmin +
+    (fn.optima.length > 1 ? ' (×' + fn.optima.length + ' optima)' : '');
+  els.hintBar.textContent = HINTS[fnKey] || '';
+  heatDirty = true;
+}
+
+function fullReset() {
+  applyFunction();
+  showAlgoParams();
+  resetPopulation();
+  setRunning(false);
+}
+
+// populate function selector
+FN_ORDER.forEach(k => {
+  const o = document.createElement('option');
+  o.value = k; o.textContent = FUNCTIONS[k].name;
+  els.fnSel.appendChild(o);
+});
+els.fnSel.value = fnKey;
+
+// listeners
+els.fnSel.addEventListener('change', () => {
+  fnKey = els.fnSel.value;
+  fullReset();
+});
+els.algoSel.addEventListener('change', () => {
+  algoKey = els.algoSel.value;
+  showAlgoParams();
+  resetPopulation();
+  updateReadouts();
+});
+
+els.playBtn.addEventListener('click', () => setRunning(!running));
+els.stepBtn.addEventListener('click', () => {
+  if (running) setRunning(false);
+  const speed = +els.speed.value;
+  for (let s = 0; s < speed; s++) iterate();
+  updateReadouts();
+});
+els.resetBtn.addEventListener('click', () => { resetPopulation(); setRunning(false); });
+
+// slider value-label bindings
+function bindVal(input, label, fmtFn) {
+  const upd = () => label.textContent = fmtFn(input.value);
+  input.addEventListener('input', upd);
+  upd();
+}
+bindVal(els.pop, els.popVal, v => v);
+bindVal(els.speed, els.speedVal, v => v + ' it/frame');
+bindVal(els.w, els.wVal, v => (+v).toFixed(2));
+bindVal(els.c1, els.c1Val, v => (+v).toFixed(2));
+bindVal(els.c2, els.c2Val, v => (+v).toFixed(2));
+bindVal(els.f, els.fVal, v => (+v).toFixed(2));
+bindVal(els.cr, els.crVal, v => (+v).toFixed(2));
+bindVal(els.t0, els.t0Val, v => (+v).toFixed(1));
+bindVal(els.alpha, els.alphaVal, v => (+v).toFixed(3));
+bindVal(els.saStep, els.saStepVal, v => (+v).toFixed(3));
+bindVal(els.mr, els.mrVal, v => (+v).toFixed(2));
+bindVal(els.ms, els.msVal, v => (+v).toFixed(3));
+bindVal(els.tk, els.tkVal, v => v);
+
+// population size change re-initializes (count changed)
+els.pop.addEventListener('change', () => { resetPopulation(); });
+
+// view toggles
+els.trailsChip.addEventListener('click', () => {
+  showTrails = !showTrails;
+  els.trailsChip.classList.toggle('active', showTrails);
+  if (!showTrails) for (const m of pop) m.trail = [];
+});
+els.contoursChip.addEventListener('click', () => {
+  showContours = !showContours;
+  els.contoursChip.classList.toggle('active', showContours);
+});
+
+// keyboard: space=play/pause, s=step, r=reset
+window.addEventListener('keydown', (e) => {
+  if (e.target.tagName === 'SELECT' || e.target.tagName === 'INPUT') return;
+  if (e.code === 'Space') { e.preventDefault(); setRunning(!running); }
+  else if (e.key === 's' || e.key === 'S') els.stepBtn.click();
+  else if (e.key === 'r' || e.key === 'R') els.resetBtn.click();
+});
+
+window.addEventListener('resize', resize);
+// re-measure once the browser has finished its first full layout pass
+// (guards against transient zero/tiny canvas sizes on initial paint)
+window.addEventListener('load', resize);
+
+// ============================================================
+//  BOOT
+// ============================================================
+resize();
+fullReset();
+frame();
+// belt-and-suspenders: re-measure after layout settles
+requestAnimationFrame(resize);
+setTimeout(resize, 120);
+</script>
+</body>
+</html>

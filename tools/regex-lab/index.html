@@ -1,0 +1,1371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Regex Lab — dissect, test &amp; understand regular expressions</title>
+<meta name="description" content="An offline workbench for regular expressions: live testing, plain-English explanations, railroad diagrams, capture groups and substitution preview." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Martian+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   REGEX LAB — a precision instrument for regular expressions
+   Single-file, offline-capable. Aesthetic: dark "lab bench",
+   phosphor-lime signal on warm near-black, technical mono type.
+   ============================================================ */
+:root{
+  --bg:#0b0e0d;
+  --bg-2:#0e1311;
+  --panel:#101614;
+  --panel-2:#0c100f;
+  --raise:#141b18;
+  --border:#1e2723;
+  --border-bright:#2c3832;
+  --ink:#e9ece4;
+  --ink-dim:#9aa49b;
+  --ink-faint:#626b62;
+  --acid:#b6f24a;
+  --acid-deep:#8fcf2e;
+  --acid-glow:rgba(182,242,74,.16);
+  --amber:#ffb454;
+  --cyan:#5cd1ff;
+  --magenta:#ff79b0;
+  --violet:#bba0ff;
+  --rose:#ff6b6b;
+  --mint:#5ff0b4;
+  --shadow:0 16px 40px -16px rgba(0,0,0,.7);
+  --font-ui:'Familjen Grotesk',ui-sans-serif,system-ui,-apple-system,sans-serif;
+  --font-mono:'JetBrains Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+  --font-label:'Martian Mono',ui-monospace,monospace;
+  --r:12px;
+  --r-sm:8px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:
+    radial-gradient(1200px 700px at 85% -10%, rgba(182,242,74,.06), transparent 60%),
+    radial-gradient(900px 600px at -10% 110%, rgba(92,209,255,.05), transparent 55%),
+    linear-gradient(180deg,#0c100f,#0a0d0c) fixed,
+    var(--bg);
+  color:var(--ink);
+  font-family:var(--font-ui);
+  font-size:15px;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+  min-height:100vh;
+}
+/* faint graph-paper grid overlay */
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:
+    linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px);
+  background-size:28px 28px;
+  mask-image:radial-gradient(circle at 50% 30%,#000 0%,transparent 90%);
+}
+.wrap{position:relative;z-index:1;max-width:1340px;margin:0 auto;padding:28px 26px 80px}
+a{color:inherit}
+::selection{background:var(--acid-glow);color:#fff}
+
+/* ---------- header ---------- */
+header.top{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap;margin-bottom:22px}
+.brand{display:flex;align-items:center;gap:14px}
+.mark{
+  width:46px;height:46px;flex:0 0 auto;border-radius:11px;
+  background:linear-gradient(145deg,#11211a,#0b110e);
+  border:1px solid var(--border-bright);
+  display:grid;place-items:center;position:relative;overflow:hidden;
+  box-shadow:inset 0 0 0 1px rgba(182,242,74,.06),0 6px 18px -8px #000;
+}
+.mark svg{width:30px;height:30px}
+.mark::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 30% 20%,var(--acid-glow),transparent 60%)}
+.wordmark{display:flex;flex-direction:column;line-height:1}
+.wordmark .t{font-family:var(--font-label);font-weight:700;font-size:21px;letter-spacing:.14em;color:var(--ink)}
+.wordmark .t b{color:var(--acid)}
+.wordmark .s{font-size:11.5px;color:var(--ink-faint);letter-spacing:.05em;margin-top:7px;font-family:var(--font-mono)}
+.top-actions{display:flex;gap:10px;align-items:center}
+
+/* ---------- generic buttons ---------- */
+.btn{
+  font-family:var(--font-mono);font-size:12.5px;font-weight:500;
+  color:var(--ink-dim);background:var(--panel);border:1px solid var(--border);
+  padding:8px 13px;border-radius:var(--r-sm);cursor:pointer;
+  display:inline-flex;align-items:center;gap:7px;transition:.16s ease;white-space:nowrap;
+}
+.btn:hover{border-color:var(--border-bright);color:var(--ink);background:var(--raise)}
+.btn:active{transform:translateY(1px)}
+.btn.accent{color:#0a0d0c;background:var(--acid);border-color:var(--acid)}
+.btn.accent:hover{background:#c6ff5f}
+.btn svg{width:15px;height:15px}
+.icon-btn{padding:7px 9px}
+
+/* ---------- pattern bar ---------- */
+.pattern-card{
+  background:linear-gradient(180deg,var(--panel),var(--panel-2));
+  border:1px solid var(--border-bright);border-radius:var(--r);
+  padding:16px 16px 14px;box-shadow:var(--shadow);position:relative;overflow:hidden;
+}
+.pattern-card::before{content:"";position:absolute;left:0;top:0;height:100%;width:3px;background:linear-gradient(var(--acid),var(--acid-deep))}
+.pc-label{font-family:var(--font-label);font-size:10.5px;letter-spacing:.18em;color:var(--ink-faint);text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.pc-label .dot{width:7px;height:7px;border-radius:50%;background:var(--ink-faint);box-shadow:0 0 0 0 transparent;transition:.2s}
+.pc-label .dot.ok{background:var(--acid);box-shadow:0 0 10px 1px var(--acid-glow)}
+.pc-label .dot.err{background:var(--rose);box-shadow:0 0 10px 1px rgba(255,107,107,.35)}
+.pattern-row{display:flex;align-items:stretch;gap:0;background:#070a09;border:1px solid var(--border);border-radius:var(--r-sm);overflow:hidden}
+.delim{display:flex;align-items:center;padding:0 13px;font-family:var(--font-mono);font-size:20px;color:var(--acid);background:rgba(182,242,74,.04);user-select:none}
+.delim.r{border-left:1px solid var(--border)}
+#pattern{
+  flex:1;min-width:0;border:none;outline:none;background:transparent;color:var(--ink);
+  font-family:var(--font-mono);font-size:16px;padding:14px 6px;letter-spacing:.01em;
+}
+#pattern::placeholder{color:var(--ink-faint)}
+.flags-box{display:flex;align-items:center;padding:0 10px;font-family:var(--font-mono);font-size:15px;color:var(--amber);min-width:34px}
+.flags-box:empty::after{content:"—";color:var(--ink-faint)}
+.copy-regex{display:flex;align-items:center;padding:0 14px;background:rgba(182,242,74,.04);border:0;border-left:1px solid var(--border);color:var(--ink-faint);cursor:pointer;transition:.15s}
+.copy-regex:hover{color:var(--acid);background:rgba(182,242,74,.1)}
+.copy-regex svg{width:16px;height:16px}
+
+.pattern-meta{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:12px;flex-wrap:wrap}
+.flags{display:flex;gap:6px;flex-wrap:wrap}
+.flag{
+  font-family:var(--font-mono);font-size:12px;color:var(--ink-faint);
+  border:1px solid var(--border);background:var(--panel-2);border-radius:6px;
+  padding:5px 8px 5px 7px;cursor:pointer;display:flex;align-items:center;gap:6px;transition:.14s;user-select:none;
+}
+.flag:hover{border-color:var(--border-bright);color:var(--ink-dim)}
+.flag.on{color:var(--acid);border-color:rgba(182,242,74,.4);background:rgba(182,242,74,.07)}
+.flag .k{font-weight:700;font-size:13px}
+.flag .d{opacity:.85;font-size:11px}
+.err-msg{color:var(--rose);font-family:var(--font-mono);font-size:12.5px;display:none;align-items:center;gap:7px}
+.err-msg.show{display:flex}
+.err-msg svg{width:14px;height:14px;flex:0 0 auto}
+
+/* ---------- main grid ---------- */
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:18px;align-items:start}
+@media(max-width:980px){.grid{grid-template-columns:1fr}}
+.panel{
+  background:linear-gradient(180deg,var(--panel),var(--panel-2));
+  border:1px solid var(--border);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow);
+}
+.panel-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 15px;border-bottom:1px solid var(--border)}
+.panel-title{font-family:var(--font-label);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-dim);display:flex;align-items:center;gap:9px}
+.panel-title .ic{color:var(--acid);display:flex}
+.panel-title .ic svg{width:15px;height:15px}
+.count-pill{font-family:var(--font-mono);font-size:11px;color:var(--ink-faint);border:1px solid var(--border);border-radius:20px;padding:2px 9px}
+.count-pill b{color:var(--acid);font-weight:600}
+
+/* test input + highlight overlay */
+.code-wrap{position:relative}
+.code-field{
+  font-family:var(--font-mono);font-size:14px;line-height:1.65;letter-spacing:.005em;
+  padding:15px 16px;border:0;margin:0;width:100%;
+  white-space:pre-wrap;word-break:break-word;overflow-wrap:break-word;tab-size:4;
+}
+#test{
+  position:relative;z-index:2;background:transparent;color:transparent;caret-color:var(--acid);
+  resize:vertical;min-height:280px;outline:none;display:block;
+}
+#test::selection{background:rgba(182,242,74,.22);color:transparent}
+.backdrop{
+  position:absolute;inset:0;z-index:1;color:var(--ink);overflow:hidden;pointer-events:none;
+  background:repeating-linear-gradient(180deg,transparent 0 ,transparent 27px,rgba(255,255,255,.012) 27px,rgba(255,255,255,.012) 28px);
+}
+.backdrop mark{border-radius:3px;padding:1px 0;color:#fff;box-shadow:inset 0 0 0 1px rgba(255,255,255,.06)}
+.hl0{background:rgba(182,242,74,.26);box-shadow:inset 0 -2px 0 var(--acid)!important}
+.hl1{background:rgba(92,209,255,.24);box-shadow:inset 0 -2px 0 var(--cyan)!important}
+.hl2{background:rgba(255,180,84,.26);box-shadow:inset 0 -2px 0 var(--amber)!important}
+.hl3{background:rgba(255,121,176,.24);box-shadow:inset 0 -2px 0 var(--magenta)!important}
+.hl4{background:rgba(187,160,255,.26);box-shadow:inset 0 -2px 0 var(--violet)!important}
+.hl5{background:rgba(95,240,180,.22);box-shadow:inset 0 -2px 0 var(--mint)!important}
+.zwm{display:inline-block;width:0;border-left:2px solid var(--amber);height:1.1em;vertical-align:text-bottom;margin:0 -1px;opacity:.8}
+
+/* tabs */
+.tabs{display:flex;gap:2px;padding:7px 8px 0;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.tab{
+  font-family:var(--font-mono);font-size:12px;color:var(--ink-faint);background:transparent;border:0;
+  padding:9px 12px;cursor:pointer;border-radius:7px 7px 0 0;position:relative;transition:.14s;display:flex;align-items:center;gap:7px;
+}
+.tab:hover{color:var(--ink-dim)}
+.tab.on{color:var(--ink);background:var(--raise)}
+.tab.on::after{content:"";position:absolute;left:10px;right:10px;bottom:-1px;height:2px;background:var(--acid)}
+.tab .n{font-size:10px;color:var(--ink-faint);background:var(--panel-2);border-radius:10px;padding:0 6px}
+.tab.on .n{color:var(--acid)}
+.tab-body{padding:16px;min-height:300px;max-height:620px;overflow:auto}
+.tab-pane{display:none}
+.tab-pane.on{display:block;animation:fade .25s ease}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+.empty{color:var(--ink-faint);font-family:var(--font-mono);font-size:13px;text-align:center;padding:46px 18px;line-height:1.8}
+.empty svg{width:34px;height:34px;opacity:.4;display:block;margin:0 auto 14px}
+
+/* ---------- explanation tree ---------- */
+.tree{font-size:14px}
+.node{position:relative;padding-left:18px}
+.node>.node-self{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:5px 0}
+.node>.kids{border-left:1px solid var(--border);margin-left:6px;padding-left:8px}
+.node.root{padding-left:0}
+.node.root>.kids{border-left:0;margin-left:0;padding-left:0}
+.tag{font-family:var(--font-label);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;padding:3px 7px;border-radius:5px;white-space:nowrap}
+.tag.literal{background:rgba(182,242,74,.12);color:var(--acid)}
+.tag.group{background:rgba(92,209,255,.12);color:var(--cyan)}
+.tag.look{background:rgba(187,160,255,.14);color:var(--violet)}
+.tag.quant{background:rgba(255,180,84,.13);color:var(--amber)}
+.tag.anchor{background:rgba(255,121,176,.13);color:var(--magenta)}
+.tag.class{background:rgba(95,240,180,.12);color:var(--mint)}
+.tag.alt{background:rgba(255,107,107,.12);color:var(--rose)}
+.tag.meta{background:var(--raise);color:var(--ink-dim)}
+.tok{font-family:var(--font-mono);font-size:13px;background:#070a09;border:1px solid var(--border);border-radius:5px;padding:2px 7px;color:var(--ink)}
+.tok.acc{color:var(--acid);border-color:rgba(182,242,74,.25)}
+.desc{color:var(--ink-dim);font-size:13.5px}
+.desc b{color:var(--ink);font-weight:600}
+.altlabel{font-family:var(--font-mono);font-size:11px;color:var(--rose);padding:2px 0}
+
+/* ---------- diagram ---------- */
+.diagram-tools{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:10px;flex-wrap:wrap}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-family:var(--font-mono);font-size:11px;color:var(--ink-faint)}
+.legend span{display:flex;align-items:center;gap:6px}
+.legend i{width:11px;height:11px;border-radius:3px;display:inline-block}
+.diagram-scroll{overflow:auto;border:1px solid var(--border);border-radius:var(--r-sm);background:
+  radial-gradient(circle at 1px 1px,rgba(255,255,255,.04) 1px,transparent 0) 0 0/22px 22px,var(--panel-2);
+  padding:10px}
+.diagram-scroll svg{display:block}
+
+/* ---------- matches table ---------- */
+.mtable{width:100%;border-collapse:collapse;font-family:var(--font-mono);font-size:12.5px}
+.mtable th{text-align:left;color:var(--ink-faint);font-weight:500;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;padding:8px 10px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--panel)}
+.mtable td{padding:8px 10px;border-bottom:1px solid var(--border);vertical-align:top;color:var(--ink-dim)}
+.mtable tr:hover td{background:rgba(255,255,255,.015)}
+.mtable .ix{color:var(--ink-faint)}
+.mval{color:#fff;background:rgba(182,242,74,.12);border-radius:4px;padding:1px 6px;border:1px solid rgba(182,242,74,.2)}
+.groups{display:flex;flex-direction:column;gap:4px}
+.grp{display:flex;gap:8px;align-items:baseline}
+.grp .gi{color:var(--cyan);min-width:30px}
+.grp .gn{color:var(--violet)}
+.grp .gv{color:var(--ink)}
+.grp .empty-grp{color:var(--ink-faint);font-style:italic}
+
+/* ---------- replace ---------- */
+.replace-input{width:100%;font-family:var(--font-mono);font-size:14px;background:#070a09;border:1px solid var(--border);border-radius:var(--r-sm);color:var(--ink);padding:12px 14px;outline:none}
+.replace-input:focus{border-color:var(--border-bright)}
+.replace-hint{font-family:var(--font-mono);font-size:11.5px;color:var(--ink-faint);margin:8px 2px 16px;line-height:1.7}
+.replace-hint code{color:var(--amber)}
+.replace-out{font-family:var(--font-mono);font-size:14px;line-height:1.7;white-space:pre-wrap;word-break:break-word;background:var(--panel-2);border:1px solid var(--border);border-radius:var(--r-sm);padding:14px 15px;min-height:90px}
+.replace-out ins{text-decoration:none;background:rgba(95,240,180,.16);color:#fff;border-radius:3px;padding:0 2px;box-shadow:inset 0 -2px 0 var(--mint)}
+
+/* ---------- library ---------- */
+.lib-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+.spec{
+  text-align:left;background:var(--panel-2);border:1px solid var(--border);border-radius:var(--r-sm);
+  padding:13px 14px;cursor:pointer;transition:.15s;display:flex;flex-direction:column;gap:7px;
+}
+.spec:hover{border-color:var(--acid);transform:translateY(-2px);box-shadow:0 10px 24px -14px var(--acid-glow)}
+.spec .sn{font-weight:600;font-size:13.5px;color:var(--ink);display:flex;align-items:center;justify-content:space-between;gap:8px}
+.spec .sp{font-family:var(--font-mono);font-size:11px;color:var(--acid);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.spec .sd{font-size:11.5px;color:var(--ink-faint);line-height:1.45}
+
+/* cheatsheet */
+.cheat{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:18px}
+.cheat-group h4{font-family:var(--font-label);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-dim);margin:0 0 10px;border-bottom:1px solid var(--border);padding-bottom:7px}
+.cheat-row{display:flex;gap:10px;padding:4px 0;align-items:baseline;font-size:12.5px}
+.cheat-row code{font-family:var(--font-mono);color:var(--acid);background:#070a09;border:1px solid var(--border);border-radius:5px;padding:1px 7px;min-width:46px;text-align:center;flex:0 0 auto}
+.cheat-row span{color:var(--ink-dim)}
+
+/* modal */
+.modal-backdrop{position:fixed;inset:0;background:rgba(5,7,6,.72);backdrop-filter:blur(3px);z-index:50;display:none;align-items:flex-start;justify-content:center;padding:48px 20px;overflow:auto}
+.modal-backdrop.show{display:flex;animation:fade .2s ease}
+.modal{background:linear-gradient(180deg,var(--panel),var(--panel-2));border:1px solid var(--border-bright);border-radius:14px;max-width:880px;width:100%;box-shadow:0 30px 80px -20px #000}
+.modal-head{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid var(--border)}
+.modal-head h3{margin:0;font-family:var(--font-label);font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink)}
+.modal-body{padding:20px}
+
+footer.foot{margin-top:46px;text-align:center;color:var(--ink-faint);font-family:var(--font-mono);font-size:11.5px;line-height:1.9}
+footer.foot b{color:var(--acid-deep)}
+.toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--acid);color:#0a0d0c;font-family:var(--font-mono);font-size:12.5px;font-weight:600;padding:10px 16px;border-radius:8px;opacity:0;pointer-events:none;transition:.25s;z-index:90;box-shadow:0 10px 30px -8px var(--acid-glow)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* scrollbars */
+*::-webkit-scrollbar{width:10px;height:10px}
+*::-webkit-scrollbar-track{background:transparent}
+*::-webkit-scrollbar-thumb{background:var(--border-bright);border-radius:10px;border:2px solid var(--bg)}
+*::-webkit-scrollbar-thumb:hover{background:#3a4842}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="brand">
+      <div class="mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="var(--acid)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="7"></circle>
+          <path d="M21 21l-4.3-4.3"></path>
+          <path d="M8.2 11h5.6M11 8.2v5.6" opacity=".55"></path>
+        </svg>
+      </div>
+      <div class="wordmark">
+        <div class="t">REGEX<b>·</b>LAB</div>
+        <div class="s">dissect · test · understand</div>
+      </div>
+    </div>
+    <div class="top-actions">
+      <button class="btn" id="btn-cheat" title="Token reference">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16M4 12h16M4 19h10"/></svg>
+        Cheatsheet
+      </button>
+      <button class="btn" id="btn-copy-link" title="Copy a shareable link to this session">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7 0l2-2a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-2 2a5 5 0 0 0 7 7l1-1"/></svg>
+        Share
+      </button>
+    </div>
+  </header>
+
+  <!-- PATTERN BAR -->
+  <section class="pattern-card">
+    <div class="pc-label"><span class="dot" id="status-dot"></span> Pattern</div>
+    <div class="pattern-row">
+      <span class="delim">/</span>
+      <input id="pattern" spellcheck="false" autocomplete="off" autocapitalize="off" placeholder="type a regular expression…" />
+      <span class="delim r">/</span>
+      <span class="flags-box" id="flags-box"></span>
+      <button class="copy-regex" id="copy-regex" title="Copy /pattern/flags to clipboard" aria-label="Copy regex">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+      </button>
+    </div>
+    <div class="pattern-meta">
+      <div class="flags" id="flags">
+        <label class="flag" data-flag="g"><span class="k">g</span><span class="d">global</span></label>
+        <label class="flag" data-flag="i"><span class="k">i</span><span class="d">ignore&nbsp;case</span></label>
+        <label class="flag" data-flag="m"><span class="k">m</span><span class="d">multiline</span></label>
+        <label class="flag" data-flag="s"><span class="k">s</span><span class="d">dotall</span></label>
+        <label class="flag" data-flag="u"><span class="k">u</span><span class="d">unicode</span></label>
+        <label class="flag" data-flag="y"><span class="k">y</span><span class="d">sticky</span></label>
+      </div>
+      <div class="err-msg" id="err-msg">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5v.01"/></svg>
+        <span id="err-text"></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- WORKSPACE -->
+  <div class="grid">
+
+    <!-- LEFT: test subject -->
+    <section class="panel">
+      <div class="panel-head">
+        <div class="panel-title"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h12M4 18h8"/></svg></span> Test Subject</div>
+        <div class="count-pill" id="match-count"><b>0</b> matches</div>
+      </div>
+      <div class="code-wrap">
+        <div class="backdrop code-field" id="backdrop" aria-hidden="true"></div>
+        <textarea id="test" class="code-field" spellcheck="false" autocomplete="off" placeholder="paste or type the text you want to search…"></textarea>
+      </div>
+    </section>
+
+    <!-- RIGHT: analysis -->
+    <section class="panel">
+      <div class="tabs" id="tabs">
+        <button class="tab on" data-tab="explain">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h11l3 3v13H5z"/><path d="M16 4v3h3M8 12h8M8 16h6"/></svg>
+          Explain
+        </button>
+        <button class="tab" data-tab="diagram">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="9" width="5" height="6" rx="1.5"/><rect x="16" y="9" width="5" height="6" rx="1.5"/><path d="M8 12h8"/></svg>
+          Diagram
+        </button>
+        <button class="tab" data-tab="matches">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v14H4z"/><path d="M4 9h16M9 9v10"/></svg>
+          Matches <span class="n" id="tab-mn">0</span>
+        </button>
+        <button class="tab" data-tab="replace">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h11l-3-3M20 17H9l3 3"/></svg>
+          Replace
+        </button>
+        <button class="tab" data-tab="library">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5v15M8 5v15M12 6l5 14M4 6h4M4 20h4"/></svg>
+          Library
+        </button>
+      </div>
+      <div class="tab-body">
+        <div class="tab-pane on" id="pane-explain"></div>
+        <div class="tab-pane" id="pane-diagram"></div>
+        <div class="tab-pane" id="pane-matches"></div>
+        <div class="tab-pane" id="pane-replace"></div>
+        <div class="tab-pane" id="pane-library"></div>
+      </div>
+    </section>
+  </div>
+
+  <footer class="foot">
+    <div><b>Regex Lab</b> — a single offline file. Everything runs locally in your browser; nothing is sent anywhere.</div>
+    <div style="margin-top:6px">Patterns are tested with the JavaScript regex engine · state is saved to this URL &amp; to local storage.</div>
+  </footer>
+</div>
+
+<!-- cheatsheet modal -->
+<div class="modal-backdrop" id="cheat-modal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>Regex Token Reference</h3>
+      <button class="btn icon-btn" id="cheat-close" aria-label="close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body"><div class="cheat" id="cheat-body"></div></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+/* =====================================================================
+   REGEX LAB engine
+   1. Parser        : regex source -> AST
+   2. Explainer     : AST -> nested plain-English tree
+   3. Railroad      : AST -> SVG syntax diagram
+   4. Tester        : native RegExp -> highlights, group table, replace
+   ===================================================================== */
+
+const $ = (s, r=document) => r.querySelector(s);
+const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
+const escHtml = s => s.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+const els = {
+  pattern: $('#pattern'),
+  test: $('#test'),
+  backdrop: $('#backdrop'),
+  flagsBox: $('#flags-box'),
+  flags: $('#flags'),
+  statusDot: $('#status-dot'),
+  errMsg: $('#err-msg'),
+  errText: $('#err-text'),
+  matchCount: $('#match-count'),
+  tabMn: $('#tab-mn'),
+  panes: {
+    explain: $('#pane-explain'),
+    diagram: $('#pane-diagram'),
+    matches: $('#pane-matches'),
+    replace: $('#pane-replace'),
+    library: $('#pane-library'),
+  },
+};
+
+const state = {
+  flags: { g:true, i:false, m:false, s:false, u:false, y:false },
+  replacement: '',
+  activeTab: 'explain',
+};
+
+/* ===================== 1. PARSER ===================== */
+function parseRegex(src){
+  let i = 0;
+  const len = src.length;
+  let groupCount = 0;
+  const peek = (o=0) => src[i+o];
+  const eof = () => i >= len;
+  const fail = (msg) => { const e = new Error(msg); e.pos = i; throw e; };
+
+  function parseAlternation(){
+    const options = [parseSequence()];
+    while (peek() === '|'){ i++; options.push(parseSequence()); }
+    return options.length === 1 ? options[0] : { type:'alt', options };
+  }
+  function parseSequence(){
+    const items = [];
+    while (!eof() && peek() !== '|' && peek() !== ')') items.push(parseQuantified());
+    return { type:'seq', items };
+  }
+  function parseQuantified(){
+    const atom = parseAtom();
+    const q = peek();
+    if (q === '*' || q === '+' || q === '?'){
+      i++;
+      let lazy = false;
+      if (peek() === '?'){ lazy = true; i++; }
+      const ranges = { '*':[0,Infinity], '+':[1,Infinity], '?':[0,1] };
+      return { type:'quant', child:atom, min:ranges[q][0], max:ranges[q][1], lazy, kind:q };
+    }
+    if (q === '{'){
+      const save = i; i++;
+      let n='', m='', comma=false;
+      while (/[0-9]/.test(peek())) { n += peek(); i++; }
+      if (peek() === ','){ comma = true; i++; while (/[0-9]/.test(peek())){ m += peek(); i++; } }
+      if (peek() === '}' && n !== ''){
+        i++;
+        let lazy = false; if (peek() === '?'){ lazy = true; i++; }
+        const min = parseInt(n,10);
+        const max = comma ? (m === '' ? Infinity : parseInt(m,10)) : min;
+        return { type:'quant', child:atom, min, max, lazy, kind:'{}' };
+      }
+      i = save; // not a quantifier -> '{' was a literal
+    }
+    return atom;
+  }
+  function parseAtom(){
+    const c = peek();
+    if (c === '(') return parseGroup();
+    if (c === '[') return parseClass();
+    if (c === '.') { i++; return { type:'any' }; }
+    if (c === '^') { i++; return { type:'anchor', kind:'start' }; }
+    if (c === '$') { i++; return { type:'anchor', kind:'end' }; }
+    if (c === '\\') return parseEscape();
+    if (c === ')' || c === undefined) fail('Unexpected token');
+    i++;
+    return { type:'char', value:c };
+  }
+  function parseGroup(){
+    i++; // (
+    let kind='capture', name=null, num=null;
+    if (peek() === '?'){
+      i++;
+      const n = peek();
+      if (n === ':'){ i++; kind='noncapture'; }
+      else if (n === '='){ i++; kind='lookahead'; }
+      else if (n === '!'){ i++; kind='neglookahead'; }
+      else if (n === '<'){
+        i++;
+        const n2 = peek();
+        if (n2 === '='){ i++; kind='lookbehind'; }
+        else if (n2 === '!'){ i++; kind='neglookbehind'; }
+        else {
+          kind='named'; let nm='';
+          while (!eof() && peek() !== '>'){ nm += peek(); i++; }
+          if (peek() === '>') i++; else fail('Unterminated group name');
+          name = nm; groupCount++; num = groupCount;
+        }
+      } else fail('Invalid group construct "(?' + (n||'') + '"');
+    } else { groupCount++; num = groupCount; }
+    const body = parseAlternation();
+    if (peek() === ')') i++; else fail('Unclosed group — missing ")"');
+    return { type:'group', kind, name, num, body };
+  }
+  function classAtom(){
+    if (peek() === '\\'){
+      i++; const c = peek(); i++;
+      if ('dDwWsS'.includes(c)) return { type:'shorthand', value:c };
+      const ctrl = { n:'newline', r:'carriage return', t:'tab', f:'form feed', v:'vertical tab', '0':'null', b:'backspace' };
+      if (ctrl[c]) return { type:'char', value:'\\'+c, display:ctrl[c], escaped:true };
+      if (c === 'x'){ const h = src.substr(i,2); i+=2; return { type:'char', value:'\\x'+h, escaped:true }; }
+      if (c === 'u'){ const h = src.substr(i,4); i+=4; return { type:'char', value:'\\u'+h, escaped:true }; }
+      return { type:'char', value:c, escaped:true };
+    }
+    const c = peek(); i++;
+    return { type:'char', value:c };
+  }
+  function parseClass(){
+    i++; // [
+    let negated = false;
+    if (peek() === '^'){ negated = true; i++; }
+    const parts = [];
+    if (peek() === ']'){ parts.push({ type:'char', value:']' }); i++; }
+    while (!eof() && peek() !== ']'){
+      const item = classAtom();
+      if (peek() === '-' && peek(1) !== ']' && peek(1) !== undefined && item.type === 'char'){
+        i++; // -
+        const to = classAtom();
+        if (to.type === 'char'){
+          parts.push({ type:'range', from:item, to });
+        } else {
+          parts.push(item, { type:'char', value:'-' }, to);
+        }
+      } else parts.push(item);
+    }
+    if (peek() === ']') i++; else fail('Unclosed character class — missing "]"');
+    return { type:'class', negated, parts };
+  }
+  function parseEscape(){
+    i++; // backslash
+    const c = peek();
+    if (c === undefined) fail('Dangling backslash');
+    i++;
+    if ('dDwWsS'.includes(c)) return { type:'shorthand', value:c };
+    if (c === 'b') return { type:'anchor', kind:'wordb' };
+    if (c === 'B') return { type:'anchor', kind:'nwordb' };
+    if (/[1-9]/.test(c)){ let num=c; while (/[0-9]/.test(peek())){ num += peek(); i++; } return { type:'backref', ref:parseInt(num,10) }; }
+    if (c === 'k' && peek() === '<'){ i++; let nm=''; while (!eof() && peek() !== '>'){ nm += peek(); i++; } if (peek() === '>') i++; return { type:'backref', name:nm }; }
+    if (c === 'x'){ const h = src.substr(i,2); i+=2; return { type:'char', value:'\\x'+h, escaped:true }; }
+    if (c === 'u'){
+      if (peek() === '{'){ let nm=''; i++; while (!eof() && peek() !== '}'){ nm += peek(); i++; } if (peek() === '}') i++; return { type:'char', value:'\\u{'+nm+'}', escaped:true }; }
+      const h = src.substr(i,4); i+=4; return { type:'char', value:'\\u'+h, escaped:true };
+    }
+    const ctrl = { n:'newline', r:'carriage return', t:'tab', f:'form feed', v:'vertical tab', '0':'null' };
+    if (ctrl[c]) return { type:'char', value:'\\'+c, display:ctrl[c], escaped:true };
+    return { type:'char', value:c, escaped:true };
+  }
+
+  const ast = parseAlternation();
+  if (!eof()){
+    if (peek() === ')') fail('Unmatched ")"');
+    fail('Unexpected "' + peek() + '"');
+  }
+  return ast;
+}
+
+/* ===================== 2. EXPLAINER ===================== */
+const SHORTHAND_TEXT = {
+  d:'a digit <b>0–9</b>', D:'any character that is <b>not a digit</b>',
+  w:'a word character <b>(a–z, A–Z, 0–9, _)</b>', W:'any <b>non-word</b> character',
+  s:'a whitespace character <b>(space, tab, newline…)</b>', S:'any <b>non-whitespace</b> character',
+};
+function charDisplay(node){
+  if (node.display) return node.display;
+  if (node.value === ' ') return 'a space';
+  return '“' + node.value + '”';
+}
+function classToText(node){
+  const items = node.parts.map(p => {
+    if (p.type === 'range') return '<b>' + escHtml(p.from.value) + '</b>–<b>' + escHtml(p.to.value) + '</b>';
+    if (p.type === 'shorthand') return SHORTHAND_TEXT[p.value] || ('\\'+p.value);
+    if (p.display) return p.display;
+    return '<b>' + escHtml(p.value) + '</b>';
+  });
+  const joined = items.join(', ');
+  return node.negated
+    ? 'any character <b>except</b> ' + joined
+    : 'any one of: ' + joined;
+}
+function quantText(node){
+  const {min,max,lazy} = node;
+  let base;
+  if (min===0 && max===1) base = 'optional — appears <b>0 or 1</b> time';
+  else if (min===0 && max===Infinity) base = 'repeated <b>zero or more</b> times';
+  else if (min===1 && max===Infinity) base = 'repeated <b>one or more</b> times';
+  else if (max===Infinity) base = 'repeated <b>' + min + ' or more</b> times';
+  else if (min===max) base = 'repeated <b>exactly ' + min + '</b> times';
+  else base = 'repeated <b>between ' + min + ' and ' + max + '</b> times';
+  return base + (lazy ? ' <i>(lazy: as few as possible)</i>' : '');
+}
+
+// build a node of the explanation tree as HTML
+function explainNode(node){
+  switch(node.type){
+    case 'alt': {
+      const kids = node.options.map((o,idx) =>
+        `<div class="node"><div class="node-self"><span class="altlabel">${idx===0?'either':'or'}</span></div><div class="kids">${explainNode(o)}</div></div>`
+      ).join('');
+      return wrapNode('alt','Alternation','<span class="desc">match <b>one</b> of these branches:</span>', kids);
+    }
+    case 'seq': {
+      return explainSeq(node.items);
+    }
+    case 'quant': {
+      const inner = explainNode(node.child);
+      return wrapNode('quant', kindLabel(node), `<span class="desc">${quantText(node)}</span>`, `<div class="kids">${inner}</div>`);
+    }
+    case 'group': {
+      let title, desc, cls='group';
+      switch(node.kind){
+        case 'capture': title='Group #'+node.num; desc='captured for later reference'; break;
+        case 'named': title='Group «'+escHtml(node.name)+'»'; desc='named capture #'+node.num; break;
+        case 'noncapture': title='Group'; desc='grouped, not captured'; break;
+        case 'lookahead': title='Lookahead'; desc='must be <b>followed by</b>'; cls='look'; break;
+        case 'neglookahead': title='Neg. lookahead'; desc='must <b>not</b> be followed by'; cls='look'; break;
+        case 'lookbehind': title='Lookbehind'; desc='must be <b>preceded by</b>'; cls='look'; break;
+        case 'neglookbehind': title='Neg. lookbehind'; desc='must <b>not</b> be preceded by'; cls='look'; break;
+      }
+      return wrapNode(cls, title, `<span class="desc">${desc}:</span>`, `<div class="kids">${explainNode(node.body)}</div>`);
+    }
+    case 'class':
+      return leaf('class', 'Char&nbsp;class', classToText(node), classToken(node));
+    case 'shorthand':
+      return leaf('class', 'Shorthand', SHORTHAND_TEXT[node.value] || ('\\'+node.value), '\\'+node.value);
+    case 'any':
+      return leaf('meta', 'Any', 'any character ' + (state.flags.s ? '(including line breaks, <i>s</i> flag on)' : '(except line breaks)'), '.');
+    case 'anchor': {
+      const map = {
+        start: ['Anchor', state.flags.m ? 'start of a <b>line</b>' : 'start of the <b>string</b>', '^'],
+        end: ['Anchor', state.flags.m ? 'end of a <b>line</b>' : 'end of the <b>string</b>', '$'],
+        wordb: ['Boundary', 'a <b>word boundary</b>', '\\b'],
+        nwordb: ['Boundary', 'a <b>non-boundary</b> position', '\\B'],
+      };
+      const [t,d,tok] = map[node.kind];
+      return leaf('anchor', t, d, tok);
+    }
+    case 'backref':
+      return leaf('meta', 'Backref', node.name
+        ? 'the same text matched by group «<b>'+escHtml(node.name)+'</b>»'
+        : 'the same text matched by group <b>#'+node.ref+'</b>',
+        node.name ? '\\k<'+node.name+'>' : '\\'+node.ref);
+    case 'char':
+      return leaf('literal', 'Literal', 'the character ' + charDisplay(node), tokenForChar(node));
+    default:
+      return '';
+  }
+}
+function explainSeq(items){
+  // merge runs of simple literal characters into one "text" leaf
+  const out = [];
+  let run = '';
+  const flush = () => {
+    if (run.length){
+      if (run.length === 1) out.push(leaf('literal','Literal','the character “<b>'+escHtml(run)+'</b>”', run));
+      else out.push(leaf('literal','Literal','the exact text “<b>'+escHtml(run)+'</b>”', run));
+      run = '';
+    }
+  };
+  for (const it of items){
+    if (it.type === 'char' && !it.display){ run += it.value; }
+    else { flush(); out.push(explainNode(it)); }
+  }
+  flush();
+  if (out.length === 0) return '<span class="desc">empty — matches an empty string</span>';
+  return out.join('');
+}
+function kindLabel(q){
+  return ({ '*':'Quantifier ✷','+':'Quantifier ＋','?':'Quantifier ？','{}':'Quantifier {…}' })[q.kind] || 'Quantifier';
+}
+function tokenForChar(node){ return node.display ? node.value : node.value; }
+function classToken(node){
+  const inner = node.parts.map(p => {
+    if (p.type==='range') return escHtml(p.from.value)+'-'+escHtml(p.to.value);
+    if (p.type==='shorthand') return '\\'+p.value;
+    return escHtml(p.value);
+  }).join('');
+  return '['+(node.negated?'^':'')+inner+']';
+}
+function wrapNode(cls, tag, descHtml, kidsHtml){
+  return `<div class="node"><div class="node-self"><span class="tag ${cls}">${tag}</span>${descHtml}</div>${kidsHtml}</div>`;
+}
+function leaf(cls, tag, descHtml, token){
+  const tk = token != null ? `<span class="tok ${cls==='literal'?'acc':''}">${escHtml(token)}</span>` : '';
+  return `<div class="node"><div class="node-self"><span class="tag ${cls}">${tag}</span>${tk}<span class="desc">${descHtml}</span></div></div>`;
+}
+
+function renderExplain(){
+  const src = els.pattern.value;
+  const pane = els.panes.explain;
+  if (!src){ pane.innerHTML = emptyState('Type a pattern above and its anatomy appears here — every token explained in plain English.'); return; }
+  let ast;
+  try { ast = parseRegex(src); }
+  catch(e){ pane.innerHTML = `<div class="empty">⚠ Couldn’t parse this pattern for explanation.<br><span style="color:var(--rose)">${escHtml(e.message)}</span></div>`; return; }
+  const body = explainNode(ast);
+  const flagsLine = describeFlags();
+  pane.innerHTML = `<div class="tree"><div class="node root"><div class="kids">${body}</div></div></div>${flagsLine}`;
+}
+function describeFlags(){
+  const active = Object.entries(state.flags).filter(([k,v])=>v).map(([k])=>k);
+  if (!active.length) return '';
+  const names = { g:'global (find all matches)', i:'case-insensitive', m:'multiline (^ and $ match line ends)', s:'dotall (. matches newlines)', u:'unicode', y:'sticky (match at lastIndex)' };
+  const list = active.map(f=>`<span class="tok acc">${f}</span> ${names[f]}`).join(' &nbsp;·&nbsp; ');
+  return `<div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border);font-size:12.5px;color:var(--ink-dim)"><span class="tag meta" style="margin-right:8px">Flags</span>${list}</div>`;
+}
+
+/* ===================== 3. RAILROAD DIAGRAM ===================== */
+const SVGNS = 'http://www.w3.org/2000/svg';
+const D = {
+  font: '13px "JetBrains Mono", ui-monospace, monospace',
+  boxH: 32, padX: 11, hGap: 18, vGap: 14, lead: 26,
+  groupPadX: 16, groupPadTop: 24, groupPadBot: 12,
+};
+const _mc = document.createElement('canvas');
+const _mx = _mc.getContext('2d');
+function textW(t){ _mx.font = D.font; return Math.max(16, _mx.measureText(t).width); }
+
+const DIAG_COL = {
+  literal:'#b6f24a', class:'#5ff0b4', anchor:'#ff79b0', meta:'#9aa49b',
+  group:'#5cd1ff', look:'#bba0ff', backref:'#ffb454',
+};
+function esc(s){ return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+// Each layout() returns {w,h,ay,draw(x,y)->svgString}
+function layout(node){
+  switch(node.type){
+    case 'seq': return layoutSeq(node.items);
+    case 'alt': return layoutChoice(node.options);
+    case 'quant': return layoutQuant(node);
+    case 'group': return layoutGroup(node);
+    case 'litrun': return term(node.value, 'literal', '', true);
+    case 'class': return term(classToken(node), 'class', 'character class');
+    case 'shorthand': return term('\\'+node.value, 'class', SHORTHAND_TEXT[node.value] ? '' : '');
+    case 'any': return term('.', 'meta', 'any char');
+    case 'anchor': return term(({start:'^',end:'$',wordb:'\\b',nwordb:'\\B'})[node.kind], 'anchor', '');
+    case 'backref': return term(node.name?('\\k<'+node.name+'>'):('\\'+node.ref), 'backref', '');
+    case 'char': return term(node.display ? node.value : node.value, 'literal', '', !node.display);
+    default: return term('?','meta','');
+  }
+}
+function term(label, kind, sub, rounded){
+  const w = textW(label) + D.padX*2;
+  const h = D.boxH;
+  const col = DIAG_COL[kind] || '#9aa49b';
+  return {
+    w, h, ay:h/2,
+    draw(x,y){
+      const rx = rounded ? 7 : h/2; // literals: rounded-rect; tokens: stadium
+      return `<g>
+        <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${rx}" fill="rgba(255,255,255,.025)" stroke="${col}" stroke-width="1.3"/>
+        <text x="${x+w/2}" y="${y+h/2}" fill="${col}" font-family="JetBrains Mono, monospace" font-size="13" text-anchor="middle" dominant-baseline="central">${esc(label)}</text>
+      </g>`;
+    }
+  };
+}
+function mergeLiterals(items){
+  const out=[]; let run='';
+  const flush=()=>{ if(run){ out.push({type:'litrun', value:run}); run=''; } };
+  for(const it of items){
+    if(it.type==='char' && !it.display){ run += it.value; }
+    else { flush(); out.push(it); }
+  }
+  flush();
+  return out;
+}
+function layoutSeq(rawItems){
+  const items = mergeLiterals(rawItems);
+  if (!items.length){
+    const w=28,h=D.boxH;
+    return { w, h, ay:h/2, draw:(x,y)=>line(x,y+h/2,x+w,y+h/2) };
+  }
+  const ch = items.map(layout);
+  const above = Math.max(...ch.map(c=>c.ay));
+  const below = Math.max(...ch.map(c=>c.h-c.ay));
+  const h = above + below;
+  const ay = above;
+  const w = ch.reduce((a,c)=>a+c.w,0) + D.hGap*(ch.length-1);
+  return {
+    w,h,ay,
+    draw(x,y){
+      let cx=x, out='';
+      ch.forEach((c,idx)=>{
+        if (idx>0){ out += line(cx-D.hGap, y+ay, cx, y+ay); }
+        out += c.draw(cx, y+ay-c.ay);
+        cx += c.w + D.hGap;
+      });
+      return out;
+    }
+  };
+}
+function layoutChoice(options){
+  const br = options.map(layout);
+  const maxW = Math.max(...br.map(b=>b.w));
+  const lead = D.lead;
+  const w = maxW + lead*2;
+  // vertical stack
+  const tops = []; let cy=0;
+  br.forEach(b=>{ tops.push(cy); cy += b.h + D.vGap; });
+  const h = cy - D.vGap;
+  const axes = br.map((b,i)=>tops[i]+b.ay);
+  const ay = (axes[0] + axes[axes.length-1]) / 2;
+  return {
+    w,h,ay,
+    draw(x,y){
+      let out='';
+      br.forEach((b,i)=>{
+        const bx = x + lead + (maxW-b.w)/2;
+        const baxis = y + axes[i];
+        // entry curve from (x,ay) to (x+lead, baxis)
+        out += curve(x, y+ay, x+lead, baxis);
+        // straight to centered branch
+        out += line(x+lead, baxis, bx, baxis);
+        out += b.draw(bx, y+tops[i]);
+        out += line(bx+b.w, baxis, x+w-lead, baxis);
+        // exit curve
+        out += curve(x+w-lead, baxis, x+w, y+ay);
+      });
+      return out;
+    }
+  };
+}
+function layoutQuant(node){
+  const c = layout(node.child);
+  const needSkip = node.min === 0;                 // bypass over the top
+  const needLoop = node.max === Infinity || node.max > 1; // loop underneath
+  const skipH = needSkip ? D.vGap + 10 : 0;
+  const loopH = needLoop ? D.vGap + 10 : 0;
+  const lead = 22;
+  const w = c.w + lead*2;
+  const h = skipH + c.h + loopH;
+  const ay = skipH + c.ay;
+  const label = node.kind === '{}' ? quantBadge(node) : (node.lazy ? 'lazy' : '');
+  return {
+    w,h,ay,
+    draw(x,y){
+      const A = y+ay;
+      const cx = x+lead;
+      let out='';
+      out += line(x, A, cx, A);
+      out += c.draw(cx, y+skipH);
+      out += line(cx+c.w, A, x+w, A);
+      if (needSkip){
+        const topY = y + 6;
+        out += `<path d="M ${x} ${A} C ${x+lead*0.6} ${A} ${x+8} ${topY} ${x+lead} ${topY} L ${x+w-lead} ${topY} C ${x+w-8} ${topY} ${x+w-lead*0.6} ${A} ${x+w} ${A}" fill="none" stroke="var(--border-bright)" stroke-width="1.4"/>`;
+      }
+      if (needLoop){
+        const botY = y + h - 6;
+        out += `<path d="M ${cx+c.w} ${A} C ${cx+c.w+10} ${A} ${cx+c.w+lead*0.5} ${botY} ${cx+c.w-6} ${botY} L ${cx+6} ${botY} C ${cx-lead*0.5} ${botY} ${cx-10} ${A} ${cx} ${A}" fill="none" stroke="var(--amber)" stroke-width="1.4" opacity=".75"/>`;
+        // little return arrow
+        out += `<path d="M ${cx+8} ${botY-4} L ${cx} ${botY} L ${cx+8} ${botY+4}" fill="none" stroke="var(--amber)" stroke-width="1.4" opacity=".75"/>`;
+      }
+      if (label){
+        const lw = textW(label)+10;
+        const ly = needLoop ? y+h-6 : A;
+        out += `<g><rect x="${x+w/2-lw/2}" y="${ly-9}" width="${lw}" height="18" rx="9" fill="#0c100f" stroke="var(--amber)" stroke-width="1"/><text x="${x+w/2}" y="${ly}" fill="var(--amber)" font-family="JetBrains Mono,monospace" font-size="10.5" text-anchor="middle" dominant-baseline="central">${esc(label)}</text></g>`;
+      }
+      return out;
+    }
+  };
+}
+function quantBadge(node){
+  const {min,max,lazy} = node;
+  let s;
+  if (max===Infinity) s = min+'…∞';
+  else if (min===max) s = '×'+min;
+  else s = min+'–'+max;
+  return s + (lazy?' ?':'');
+}
+function layoutGroup(node){
+  const inner = layout(node.body);
+  const px=D.groupPadX, pt=D.groupPadTop, pb=D.groupPadBot;
+  const w = inner.w + px*2;
+  const h = inner.h + pt + pb;
+  const ay = pt + inner.ay;
+  let tag, col;
+  switch(node.kind){
+    case 'capture': tag='group #'+node.num; col=DIAG_COL.group; break;
+    case 'named': tag='«'+node.name+'»'; col=DIAG_COL.group; break;
+    case 'noncapture': tag='(?: )'; col=DIAG_COL.meta; break;
+    case 'lookahead': tag='followed by'; col=DIAG_COL.look; break;
+    case 'neglookahead': tag='NOT followed by'; col=DIAG_COL.look; break;
+    case 'lookbehind': tag='preceded by'; col=DIAG_COL.look; break;
+    case 'neglookbehind': tag='NOT preceded by'; col=DIAG_COL.look; break;
+  }
+  const dashed = node.kind.includes('look') || node.kind==='noncapture';
+  return {
+    w,h,ay,
+    draw(x,y){
+      const A = y+ay;
+      let out='';
+      out += `<rect x="${x+1}" y="${y+1}" width="${w-2}" height="${h-2}" rx="10" fill="rgba(255,255,255,.012)" stroke="${col}" stroke-width="1.2" ${dashed?'stroke-dasharray="5 4"':''} opacity=".9"/>`;
+      out += `<text x="${x+12}" y="${y+13}" fill="${col}" font-family="Martian Mono, monospace" font-size="9.5" letter-spacing="1" dominant-baseline="central">${esc(tag.toUpperCase())}</text>`;
+      out += line(x, A, x+px, A);
+      out += inner.draw(x+px, y+pt);
+      out += line(x+px+inner.w, A, x+w, A);
+      return out;
+    }
+  };
+}
+function line(x1,y1,x2,y2){ return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="var(--border-bright)" stroke-width="1.4"/>`; }
+function curve(x1,y1,x2,y2){ const mx=(x1+x2)/2; return `<path d="M ${x1} ${y1} C ${mx} ${y1} ${mx} ${y2} ${x2} ${y2}" fill="none" stroke="var(--border-bright)" stroke-width="1.4"/>`; }
+
+function renderDiagram(){
+  const pane = els.panes.diagram;
+  const src = els.pattern.value;
+  if (!src){ pane.innerHTML = emptyState('A railroad diagram of your pattern will be drawn here. Read it left-to-right; any path through the rails is a valid match.'); return; }
+  let ast;
+  try { ast = parseRegex(src); }
+  catch(e){ pane.innerHTML = `<div class="empty">⚠ Diagram unavailable — ${escHtml(e.message)}</div>`; return; }
+  const root = layout(ast);
+  const pad = 24;
+  const startStub = 16, endStub = 16;
+  const W = root.w + pad*2 + startStub + endStub;
+  const H = root.h + pad*2;
+  const ay = pad + root.ay;
+  const body =
+    `<circle cx="${pad}" cy="${ay}" r="4" fill="var(--acid)"/>` +
+    line(pad, ay, pad+startStub, ay) +
+    root.draw(pad+startStub, pad) +
+    line(pad+startStub+root.w, ay, W-pad, ay) +
+    `<circle cx="${W-pad}" cy="${ay}" r="4" fill="var(--acid)"/>`;
+  const svg = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="${SVGNS}" font-family="JetBrains Mono, monospace">${body}</svg>`;
+  pane.innerHTML =
+    `<div class="diagram-tools"><div class="legend">
+      <span><i style="background:#b6f24a"></i>literal</span>
+      <span><i style="background:#5ff0b4"></i>class</span>
+      <span><i style="background:#ff79b0"></i>anchor</span>
+      <span><i style="background:#5cd1ff"></i>group</span>
+      <span><i style="background:#bba0ff"></i>lookaround</span>
+      <span><i style="background:#ffb454"></i>repeat</span>
+    </div></div>
+    <div class="diagram-scroll">${svg}</div>`;
+}
+
+/* ===================== 4. TESTER (native RegExp) ===================== */
+function currentFlags(){ return Object.entries(state.flags).filter(([k,v])=>v).map(([k])=>k).join(''); }
+
+let lastMatches = [];
+function buildRegex(forceGlobal){
+  const src = els.pattern.value;
+  let flags = currentFlags();
+  if (forceGlobal && !flags.includes('g')) flags += 'g';
+  // sticky + forced global don't mix well for iteration; drop y when forcing global
+  if (forceGlobal) flags = flags.replace('y','');
+  return new RegExp(src, flags);
+}
+
+function runTester(){
+  const src = els.pattern.value;
+  const text = els.test.value;
+  // validity
+  let valid = true, errText = '';
+  if (src){
+    try { new RegExp(src, currentFlags()); }
+    catch(e){ valid = false; errText = e.message; }
+  }
+  setStatus(src ? (valid?'ok':'err') : 'idle', errText);
+
+  if (!src || !valid){
+    els.backdrop.innerHTML = escHtml(text) + '​';
+    lastMatches = [];
+    updateCounts(0);
+    renderMatches();
+    renderReplace();
+    return;
+  }
+
+  // collect matches with a global clone for iteration
+  const gre = buildRegex(true);
+  const matches = [];
+  let m, guard = 0;
+  while ((m = gre.exec(text)) !== null){
+    matches.push({ index:m.index, value:m[0], groups:Array.from(m).slice(1), named:m.groups?{...m.groups}:null });
+    if (m.index === gre.lastIndex) gre.lastIndex++; // zero-length progress
+    if (++guard > 50000) break;
+    if (!currentFlags().includes('g') && !currentFlags().includes('y')){
+      // non-global: only first match
+      break;
+    }
+  }
+  lastMatches = matches;
+  highlight(text, matches);
+  updateCounts(matches.length);
+  renderMatches();
+  renderReplace();
+}
+
+function highlight(text, matches){
+  let html = '', last = 0, ci = 0;
+  for (const mt of matches){
+    if (mt.index < last) continue; // skip overlaps defensively
+    html += escHtml(text.slice(last, mt.index));
+    if (mt.value.length === 0){
+      html += '<span class="zwm"></span>';
+    } else {
+      html += `<mark class="hl${ci%6}">${escHtml(mt.value)}</mark>`;
+      ci++;
+    }
+    last = mt.index + mt.value.length;
+  }
+  html += escHtml(text.slice(last));
+  els.backdrop.innerHTML = html + '​';
+}
+
+function updateCounts(n){
+  els.matchCount.innerHTML = `<b>${n}</b> match${n===1?'':'es'}`;
+  els.tabMn.textContent = n;
+}
+
+function renderMatches(){
+  const pane = els.panes.matches;
+  if (!els.pattern.value){ pane.innerHTML = emptyState('Matches and their capture groups will be listed here.'); return; }
+  if (!lastMatches.length){ pane.innerHTML = emptyState('No matches in the current test subject.'); return; }
+  const shown = lastMatches.slice(0,500);
+  let rows = '';
+  shown.forEach((mt,idx)=>{
+    let groupHtml = '';
+    if (mt.groups.length){
+      groupHtml = '<div class="groups">' + mt.groups.map((g,gi)=>{
+        const namedKey = mt.named ? Object.keys(mt.named).find(k=>mt.named[k]===g) : null;
+        return `<div class="grp"><span class="gi">$${gi+1}</span>${namedKey?`<span class="gn">${escHtml(namedKey)}</span>`:''}<span class="gv">${g===undefined?'<span class="empty-grp">— (no match)</span>':escHtml(g)}</span></div>`;
+      }).join('') + '</div>';
+    } else groupHtml = '<span class="ix">—</span>';
+    rows += `<tr><td class="ix">${idx+1}</td><td class="ix">${mt.index}</td><td><span class="mval">${escHtml(mt.value)||'∅'}</span></td><td>${groupHtml}</td></tr>`;
+  });
+  const more = lastMatches.length>500 ? `<div style="color:var(--ink-faint);font-family:var(--font-mono);font-size:11px;padding:10px 2px">… and ${lastMatches.length-500} more (showing first 500)</div>` : '';
+  pane.innerHTML = `<table class="mtable"><thead><tr><th>#</th><th>at</th><th>match</th><th>groups</th></tr></thead><tbody>${rows}</tbody></table>${more}`;
+}
+
+function renderReplace(){
+  const pane = els.panes.replace;
+  const text = els.test.value;
+  let outHtml = '';
+  if (!els.pattern.value){
+    outHtml = '<span style="color:var(--ink-faint)">enter a pattern to preview substitutions</span>';
+  } else {
+    try {
+      const re = buildRegex(false);
+      const result = text.replace(re, state.replacement);
+      // diff-ish display: show result, highlighting changed spans is hard; show plain
+      outHtml = escHtml(result) || '<span style="color:var(--ink-faint)">∅ empty result</span>';
+    } catch(e){
+      outHtml = `<span style="color:var(--rose)">${escHtml(e.message)}</span>`;
+    }
+  }
+  pane.innerHTML = `
+    <div style="font-family:var(--font-label);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:8px">Replacement string</div>
+    <input class="replace-input" id="replace-input" spellcheck="false" placeholder="e.g.  $1-$2   or   [&]" value="${escHtml(state.replacement)}"/>
+    <div class="replace-hint">Use <code>$1 $2</code> for groups, <code>$&lt;name&gt;</code> for named groups, <code>$&amp;</code> for the whole match, <code>$\`</code>/<code>$'</code> for text before/after.</div>
+    <div style="font-family:var(--font-label);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:8px">Result</div>
+    <div class="replace-out">${outHtml}</div>`;
+  const ri = $('#replace-input');
+  ri.addEventListener('input', ()=>{ state.replacement = ri.value; saveState();
+    // update only the output without re-rendering the whole pane (keep focus)
+    const text2 = els.test.value;
+    const out = $('.replace-out');
+    try { const re = buildRegex(false); out.innerHTML = escHtml(text2.replace(re, state.replacement)) || '<span style="color:var(--ink-faint)">∅ empty result</span>'; }
+    catch(e){ out.innerHTML = `<span style="color:var(--rose)">${escHtml(e.message)}</span>`; }
+  });
+}
+
+function emptyState(msg){
+  return `<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>${msg}</div>`;
+}
+
+function setStatus(kind, msg){
+  els.statusDot.className = 'dot' + (kind==='ok'?' ok':kind==='err'?' err':'');
+  if (kind==='err'){ els.errMsg.classList.add('show'); els.errText.textContent = msg; }
+  else els.errMsg.classList.remove('show');
+}
+
+/* ===================== ORCHESTRATION ===================== */
+let rafPending = false;
+function runAll(){
+  runTester();
+  renderExplain();
+  if (state.activeTab === 'diagram') renderDiagram(); else diagramDirty = true;
+  saveState();
+}
+let diagramDirty = true;
+function schedule(){
+  if (rafPending) return;
+  rafPending = true;
+  requestAnimationFrame(()=>{ rafPending = false; runAll(); });
+}
+
+/* tabs */
+$$('.tab').forEach(t=>{
+  t.addEventListener('click', ()=>{
+    $$('.tab').forEach(x=>x.classList.remove('on'));
+    $$('.tab-pane').forEach(x=>x.classList.remove('on'));
+    t.classList.add('on');
+    const id = t.dataset.tab;
+    els.panes[id].classList.add('on');
+    state.activeTab = id;
+    if (id === 'diagram' && diagramDirty){ renderDiagram(); diagramDirty = false; }
+    if (id === 'library') renderLibrary();
+    saveState();
+  });
+});
+
+/* flags */
+$$('.flag').forEach(f=>{
+  f.addEventListener('click', ()=>{
+    const k = f.dataset.flag;
+    state.flags[k] = !state.flags[k];
+    f.classList.toggle('on', state.flags[k]);
+    updateFlagsBox();
+    schedule();
+  });
+});
+function updateFlagsBox(){
+  els.flagsBox.textContent = currentFlags();
+}
+
+/* scroll sync for highlight overlay */
+els.test.addEventListener('scroll', ()=>{
+  els.backdrop.scrollTop = els.test.scrollTop;
+  els.backdrop.scrollLeft = els.test.scrollLeft;
+});
+
+/* inputs */
+els.pattern.addEventListener('input', schedule);
+els.test.addEventListener('input', schedule);
+
+/* ===================== LIBRARY ===================== */
+const LIBRARY = [
+  { name:'Email address', flags:'gi', desc:'A practical (not RFC-perfect) email matcher.',
+    pattern:'([a-z0-9._%+-]+)@([a-z0-9.-]+)\\.([a-z]{2,})',
+    test:'Reach me at jane.doe@example.com or sales@sub.domain.co.uk — not "bad@@x".' },
+  { name:'URL', flags:'gi', desc:'http/https URLs with optional path & query.',
+    pattern:'https?:\\/\\/[^\\s/$.?#].[^\\s]*',
+    test:'Docs: https://example.com/path?q=1#frag and http://a.io. Plain text http:// is skipped.' },
+  { name:'IPv4 address', flags:'g', desc:'Four octets, each 0–255.',
+    pattern:'\\b((25[0-5]|2[0-4]\\d|1?\\d?\\d)\\.){3}(25[0-5]|2[0-4]\\d|1?\\d?\\d)\\b',
+    test:'Gateway 192.168.0.1, DNS 8.8.8.8, invalid 999.1.1.1 (partial).' },
+  { name:'Hex color', flags:'g', desc:'#RGB or #RRGGBB.',
+    pattern:'#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})\\b',
+    test:'Palette: #fff, #B6F24A, #0a0d0c and bad #12.' },
+  { name:'ISO date', flags:'g', desc:'YYYY-MM-DD with named groups.',
+    pattern:'(?<year>\\d{4})-(?<month>\\d{2})-(?<day>\\d{2})',
+    test:'Today is 2026-06-14, deadline 2026-12-31.' },
+  { name:'Time 24h', flags:'g', desc:'HH:MM, optional :SS.',
+    pattern:'\\b([01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d)?\\b',
+    test:'Standup 09:30, deploy 23:59:59, bad 24:00.' },
+  { name:'Semantic version', flags:'g', desc:'major.minor.patch with optional pre-release.',
+    pattern:'\\bv?(\\d+)\\.(\\d+)\\.(\\d+)(?:-([0-9A-Za-z.-]+))?\\b',
+    test:'Released v1.2.3, then 2.0.0-rc.1 and 10.4.17.' },
+  { name:'Markdown link', flags:'g', desc:'[text](url) with two capture groups.',
+    pattern:'\\[([^\\]]+)\\]\\(([^)]+)\\)',
+    test:'See [the docs](https://example.com) and [home](/).' },
+  { name:'HTML tag', flags:'g', desc:'Opening/closing/self-closing tags.',
+    pattern:'<\\/?([a-zA-Z][a-zA-Z0-9]*)\\b[^>]*>',
+    test:'<div class="x"><img src="a.png"/></div> plain text.' },
+  { name:'Strong password', flags:'', desc:'Lookaheads: 8+ chars, upper, lower, digit, symbol.',
+    pattern:'^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z0-9]).{8,}$',
+    test:'Sw1ft-Otter!' },
+  { name:'Word duplicate', flags:'gi', desc:'Backreference: a word repeated twice.',
+    pattern:'\\b(\\w+)\\s+\\1\\b',
+    test:'This this is a a common typo, but not unique words.' },
+  { name:'Slug', flags:'g', desc:'lowercase-words-with-hyphens.',
+    pattern:'^[a-z0-9]+(?:-[a-z0-9]+)*$',
+    test:'my-cool-post-2026' },
+  { name:'UUID v4', flags:'gi', desc:'Canonical 8-4-4-4-12 form.',
+    pattern:'\\b[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\\b',
+    test:'id = 9b2e4c1a-7f3d-4a2b-9c1e-1234567890ab' },
+  { name:'Phone (US)', flags:'g', desc:'Flexible (123) 456-7890 style.',
+    pattern:'\\(?\\d{3}\\)?[\\s.-]?\\d{3}[\\s.-]?\\d{4}',
+    test:'Call (415) 555-0132 or 212.555.7788 or 8005551234.' },
+  { name:'Trailing whitespace', flags:'gm', desc:'Spaces/tabs at end of a line.',
+    pattern:'[ \\t]+$',
+    test:'clean line\nmessy line   \ntab line\t\t' },
+  { name:'Numbers w/ decimals', flags:'g', desc:'Optional sign, thousands, decimals.',
+    pattern:'-?\\d{1,3}(?:,\\d{3})*(?:\\.\\d+)?',
+    test:'Totals: 1,234.56, -42, 1000000, 3.14159.' },
+];
+
+function renderLibrary(){
+  const pane = els.panes.library;
+  pane.innerHTML = `<div style="color:var(--ink-faint);font-family:var(--font-mono);font-size:11.5px;margin-bottom:14px">Click any specimen to load its pattern, flags and sample text into the lab.</div><div class="lib-grid">${
+    LIBRARY.map((s,idx)=>`<button class="spec" data-lib="${idx}">
+      <span class="sn">${escHtml(s.name)}${s.flags?`<span style="font-family:var(--font-mono);font-size:10px;color:var(--ink-faint)">/${s.flags}</span>`:''}</span>
+      <span class="sp">/${escHtml(s.pattern.length>34?s.pattern.slice(0,34)+'…':s.pattern)}/</span>
+      <span class="sd">${escHtml(s.desc)}</span>
+    </button>`).join('')
+  }</div>`;
+  $$('.spec', pane).forEach(b=>{
+    b.addEventListener('click', ()=>{
+      const s = LIBRARY[+b.dataset.lib];
+      loadSpecimen(s);
+    });
+  });
+}
+function loadSpecimen(s){
+  els.pattern.value = s.pattern;
+  els.test.value = s.test;
+  // set flags
+  Object.keys(state.flags).forEach(k=> state.flags[k] = s.flags.includes(k));
+  $$('.flag').forEach(f=> f.classList.toggle('on', state.flags[f.dataset.flag]));
+  updateFlagsBox();
+  state.replacement = '';
+  runAll();
+  // jump to explain
+  $$('.tab').forEach(x=>x.classList.remove('on'));
+  $$('.tab-pane').forEach(x=>x.classList.remove('on'));
+  $('.tab[data-tab="explain"]').classList.add('on');
+  els.panes.explain.classList.add('on');
+  state.activeTab='explain';
+  toast('Loaded: '+s.name);
+}
+
+/* ===================== CHEATSHEET ===================== */
+const CHEAT = [
+  { h:'Character classes', rows:[
+    ['.','any char except newline'],['\\d','digit 0–9'],['\\D','non-digit'],
+    ['\\w','word char a-z A-Z 0-9 _'],['\\W','non-word char'],['\\s','whitespace'],['\\S','non-whitespace'],
+    ['[abc]','a, b or c'],['[^abc]','not a, b or c'],['[a-z]','range a to z'],
+  ]},
+  { h:'Anchors & boundaries', rows:[
+    ['^','start of string / line'],['$','end of string / line'],
+    ['\\b','word boundary'],['\\B','not a word boundary'],
+  ]},
+  { h:'Quantifiers', rows:[
+    ['*','0 or more'],['+','1 or more'],['?','0 or 1 (optional)'],
+    ['{n}','exactly n'],['{n,}','n or more'],['{n,m}','between n and m'],['*?','lazy (as few as possible)'],
+  ]},
+  { h:'Groups & references', rows:[
+    ['(…)','capturing group'],['(?:…)','non-capturing group'],['(?<name>…)','named group'],
+    ['\\1','backref to group 1'],['\\k<name>','backref to named'],['a|b','a or b (alternation)'],
+  ]},
+  { h:'Lookaround', rows:[
+    ['(?=…)','followed by'],['(?!…)','not followed by'],
+    ['(?<=…)','preceded by'],['(?<!…)','not preceded by'],
+  ]},
+  { h:'Escapes', rows:[
+    ['\\n','newline'],['\\t','tab'],['\\r','carriage return'],
+    ['\\.','literal dot'],['\\\\','literal backslash'],['\\uFFFF','unicode code point'],
+  ]},
+];
+function renderCheat(){
+  $('#cheat-body').innerHTML = CHEAT.map(g=>`<div class="cheat-group"><h4>${g.h}</h4>${
+    g.rows.map(([c,d])=>`<div class="cheat-row"><code>${escHtml(c)}</code><span>${escHtml(d)}</span></div>`).join('')
+  }</div>`).join('');
+}
+$('#btn-cheat').addEventListener('click', ()=>{ renderCheat(); $('#cheat-modal').classList.add('show'); });
+$('#cheat-close').addEventListener('click', ()=> $('#cheat-modal').classList.remove('show'));
+$('#cheat-modal').addEventListener('click', e=>{ if (e.target.id==='cheat-modal') $('#cheat-modal').classList.remove('show'); });
+document.addEventListener('keydown', e=>{ if (e.key==='Escape') $('#cheat-modal').classList.remove('show'); });
+
+/* ===================== SHARE / PERSISTENCE ===================== */
+function serialize(){
+  return { p:els.pattern.value, f:currentFlags(), t:els.test.value, r:state.replacement, tab:state.activeTab };
+}
+function saveState(){
+  try { localStorage.setItem('regexlab', JSON.stringify(serialize())); } catch(e){}
+  // lightweight hash (debounced via rAF already)
+  const data = serialize();
+  const enc = encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(data)))));
+  history.replaceState(null, '', '#' + enc);
+}
+function loadState(){
+  let data = null;
+  if (location.hash.length > 1){
+    try { data = JSON.parse(decodeURIComponent(escape(atob(decodeURIComponent(location.hash.slice(1)))))); } catch(e){ data = null; }
+  }
+  if (!data){
+    try { data = JSON.parse(localStorage.getItem('regexlab')); } catch(e){}
+  }
+  if (!data){
+    // first-run default specimen
+    data = { p:LIBRARY[4].pattern, f:LIBRARY[4].flags, t:LIBRARY[4].test, r:'', tab:'explain' };
+  }
+  els.pattern.value = data.p || '';
+  els.test.value = data.t || '';
+  state.replacement = data.r || '';
+  Object.keys(state.flags).forEach(k=> state.flags[k] = (data.f||'').includes(k));
+  $$('.flag').forEach(f=> f.classList.toggle('on', state.flags[f.dataset.flag]));
+  updateFlagsBox();
+  if (data.tab && els.panes[data.tab]){
+    $$('.tab').forEach(x=>x.classList.remove('on'));
+    $$('.tab-pane').forEach(x=>x.classList.remove('on'));
+    const tb = $(`.tab[data-tab="${data.tab}"]`); if (tb) tb.classList.add('on');
+    els.panes[data.tab].classList.add('on');
+    state.activeTab = data.tab;
+  }
+}
+function copyText(text, okMsg){
+  const done = ()=> toast(okMsg||'Copied');
+  if (navigator.clipboard && window.isSecureContext){
+    navigator.clipboard.writeText(text).then(done, ()=> fallbackCopy(text, done));
+  } else fallbackCopy(text, done);
+}
+function fallbackCopy(text, done){
+  const ta = document.createElement('textarea');
+  ta.value = text; ta.style.position='fixed'; ta.style.top='-1000px'; ta.style.opacity='0';
+  document.body.appendChild(ta); ta.focus(); ta.select();
+  try { document.execCommand('copy'); done(); } catch(e){ toast('Copy failed — select &amp; copy manually'); }
+  document.body.removeChild(ta);
+}
+$('#btn-copy-link').addEventListener('click', ()=>{ saveState(); copyText(location.href, 'Shareable link copied'); });
+$('#copy-regex').addEventListener('click', ()=>{
+  if (!els.pattern.value){ toast('Nothing to copy'); return; }
+  copyText('/' + els.pattern.value + '/' + currentFlags(), 'Regex copied');
+});
+
+/* toast */
+let toastT;
+function toast(msg){
+  const t = $('#toast'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastT); toastT = setTimeout(()=> t.classList.remove('show'), 1800);
+}
+
+/* ===================== BOOT ===================== */
+loadState();
+runAll();
+if (state.activeTab === 'library') renderLibrary();
+// re-measure & re-draw once the custom fonts are ready (affects diagram widths)
+if (document.fonts && document.fonts.ready){
+  document.fonts.ready.then(()=>{ diagramDirty = true; if (state.activeTab==='diagram') renderDiagram(); });
+}
+</script>
+</body>
+</html>

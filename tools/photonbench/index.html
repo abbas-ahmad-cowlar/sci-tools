@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PhotonBench — photonics &amp; units workbench</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+<div id="app">
+
+  <header class="topbar">
+    <div class="brand">
+      <div class="mark"><span></span><span></span><span></span><span></span><span></span></div>
+      <div class="titles">
+        <h1>PHOTON<b>BENCH</b></h1>
+        <p>photonics &amp; units workbench · offline</p>
+      </div>
+    </div>
+    <div class="tagline">wavelength · frequency · energy · units · constants — all linked, all local</div>
+  </header>
+
+  <main class="grid">
+
+    <!-- ===== spectral converter (hero) ===== -->
+    <section class="card span-2" id="card-spectral">
+      <div class="card-head"><span class="ch-title">spectral converter</span>
+        <span class="ch-sub">edit any field — the rest follow (vacuum)</span></div>
+
+      <div class="spec-fields">
+        <div class="field"><label>wavelength λ</label>
+          <div class="inwrap"><input id="f-wavelengthNm" data-field="wavelengthNm" inputmode="decimal" autocomplete="off"><span class="u">nm</span></div></div>
+        <div class="field"><label>frequency ν</label>
+          <div class="inwrap"><input id="f-freqTHz" data-field="freqTHz" inputmode="decimal" autocomplete="off"><span class="u">THz</span></div></div>
+        <div class="field"><label>photon energy E</label>
+          <div class="inwrap"><input id="f-energyEV" data-field="energyEV" inputmode="decimal" autocomplete="off"><span class="u">eV</span></div></div>
+        <div class="field"><label>wavenumber ν̃</label>
+          <div class="inwrap"><input id="f-wavenumberCm" data-field="wavenumberCm" inputmode="decimal" autocomplete="off"><span class="u">cm⁻¹</span></div></div>
+        <div class="field"><label>angular ω</label>
+          <div class="inwrap"><input id="f-angularRadS" data-field="angularRadS" inputmode="decimal" autocomplete="off"><span class="u">rad/s</span></div></div>
+        <div class="field"><label>period T</label>
+          <div class="inwrap"><input id="f-periodFs" data-field="periodFs" inputmode="decimal" autocomplete="off"><span class="u">fs</span></div></div>
+      </div>
+
+      <div class="ruler" id="ruler">
+        <div class="ruler-bar" id="ruler-bar"></div>
+        <div class="ruler-marker" id="ruler-marker"><i></i></div>
+        <div class="ruler-ticks" id="ruler-ticks"></div>
+      </div>
+
+      <div class="spec-readout">
+        <div class="band" id="band"><span class="dot" id="band-dot"></span><span id="band-name">—</span></div>
+        <div class="medium">
+          <label>refractive index n</label>
+          <input id="f-nindex" value="1.0" inputmode="decimal" autocomplete="off">
+          <span class="med-out">λ in medium <b id="lambda-medium">—</b></span>
+        </div>
+        <div class="flux">photon flux <b id="flux">—</b> @ 1 W</div>
+      </div>
+
+      <div class="presets" id="presets"></div>
+    </section>
+
+    <!-- ===== calculator ===== -->
+    <section class="card" id="card-calc">
+      <div class="card-head"><span class="ch-title">units calculator</span>
+        <span class="ch-sub">dimensional analysis · type <kbd>to</kbd> to convert</span></div>
+      <div class="calc-inwrap">
+        <span class="prompt">›</span>
+        <input id="calc-input" placeholder="h c / 1064nm in eV" autocomplete="off" autocapitalize="off" spellcheck="false">
+      </div>
+      <div class="calc-result" id="calc-result"><span class="cr-placeholder">= …</span></div>
+      <div class="calc-examples" id="calc-examples"></div>
+      <div class="calc-history-head">history</div>
+      <div class="calc-history" id="calc-history"></div>
+    </section>
+
+    <!-- ===== power / dB ===== -->
+    <section class="card" id="card-power">
+      <div class="card-head"><span class="ch-title">optical power · dB</span>
+        <span class="ch-sub">linked power fields + ratio↔dB</span></div>
+      <div class="pw-fields">
+        <div class="field"><label>power</label><div class="inwrap"><input id="p-mW" data-pfield="mW" inputmode="decimal" autocomplete="off"><span class="u">mW</span></div></div>
+        <div class="field"><label>power</label><div class="inwrap"><input id="p-dBm" data-pfield="dBm" inputmode="decimal" autocomplete="off"><span class="u">dBm</span></div></div>
+        <div class="field"><label>power</label><div class="inwrap"><input id="p-watt" data-pfield="watt" inputmode="decimal" autocomplete="off"><span class="u">W</span></div></div>
+        <div class="field"><label>power</label><div class="inwrap"><input id="p-dBW" data-pfield="dBW" inputmode="decimal" autocomplete="off"><span class="u">dBW</span></div></div>
+      </div>
+      <div class="ratio-row">
+        <div class="field"><label>ratio (×)</label><div class="inwrap"><input id="r-ratio" inputmode="decimal" autocomplete="off"></div></div>
+        <div class="field"><label>=</label><div class="inwrap"><input id="r-db" inputmode="decimal" autocomplete="off"><span class="u">dB</span></div></div>
+        <div class="seg" id="r-mode">
+          <button data-mode="power" class="active">power ·10</button>
+          <button data-mode="amp">field ·20</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== constants ===== -->
+    <section class="card span-2" id="card-const">
+      <div class="card-head"><span class="ch-title">physical constants</span>
+        <span class="ch-sub">click to insert into the calculator · CODATA 2018</span></div>
+      <input id="const-search" class="const-search" placeholder="search  (e.g. planck, charge, c, kB)" autocomplete="off">
+      <div class="const-grid" id="const-grid"></div>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <span>PhotonBench</span> · runs entirely in your browser, no network needed ·
+    <span id="foot-counts"></span>
+  </footer>
+</div>
+
+<script src="js/units.js"></script>
+<script src="js/optics.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

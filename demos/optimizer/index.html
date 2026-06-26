@@ -304,40 +304,40 @@ canvas { display: block; }
 </style>
 <style>
   /* ---- page-local layout (design tokens come from lab.css) ---- */
-  html, body { height: 100%; }
-  body { display: flex; flex-direction: column; overflow: hidden; }
+  html, body { height: auto; min-height: 100%; }
+  /* the whole page scrolls when content overflows; columns size independently */
+  body { display: flex; flex-direction: column; min-height: 100vh; overflow-y: auto; }
 
   .lab-main {
-    flex: 1;
+    flex: 1 0 auto;
     display: flex;
     gap: 16px;
     padding: 16px;
+    align-items: flex-start;
     min-height: 0;
   }
 
-  /* control column */
+  /* control column — grows with its content; the page scrolls to reveal it */
   .controls {
     width: 312px;
     flex: 0 0 312px;
     display: flex;
     flex-direction: column;
     gap: 14px;
-    overflow-y: auto;
     padding-right: 4px;
   }
 
-  /* arena column */
+  /* arena column — a stable, viewport-relative height keeps the canvas crisp */
   .arena {
     flex: 1;
     display: flex;
     flex-direction: column;
     gap: 14px;
     min-width: 0;
-    min-height: 0;
   }
   .arena .stage.landscape {
-    flex: 1;
-    min-height: 0;
+    height: 60vh;
+    min-height: 440px;
   }
   .arena .stage.landscape canvas { width: 100%; height: 100%; }
 

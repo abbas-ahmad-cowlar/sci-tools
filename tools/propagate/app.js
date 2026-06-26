@@ -191,12 +191,13 @@
       exEl.appendChild(o);
     });
     exEl.addEventListener("change", () => {
+      if (exEl.value === "") return;            // placeholder picked — do nothing
       const ex = EXAMPLES[+exEl.value];
-      exEl.value = "";
       if (!ex) return;
       exprEl.value = ex.expr;
       for (const [k, v] of Object.entries(ex.vars)) store[k] = { value: v[0], sigma: v[1], unit: v[2] };
       recompile();
+      // leave the dropdown showing the chosen example's label
     });
   }
 

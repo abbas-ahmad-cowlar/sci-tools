@@ -303,21 +303,25 @@ canvas { display: block; }
 .muted { color: var(--ink-faint); }
 </style>
 <style>
-  html, body { height: 100%; overflow: hidden; }
+  html, body { height: auto; min-height: 100%; }
+  /* the whole page scrolls when content overflows; columns size independently */
+  body { overflow-y: auto; }
   .wrap {
     display: grid;
     grid-template-columns: 320px 1fr;
     gap: 16px;
-    height: calc(100vh - 57px);
+    min-height: calc(100vh - 57px);
     padding: 16px;
+    align-items: start;
   }
-  .side { overflow-y: auto; padding-right: 4px; display: flex; flex-direction: column; gap: 16px; }
+  .side { padding-right: 4px; display: flex; flex-direction: column; gap: 16px; }
   .main {
     display: grid;
     grid-template-rows: 1fr 230px;
     gap: 16px;
     min-width: 0;
-    min-height: 0;
+    height: calc(100vh - 89px);
+    min-height: 520px;
   }
   .stage { display: flex; flex-direction: column; min-height: 0; }
   .stage-label {

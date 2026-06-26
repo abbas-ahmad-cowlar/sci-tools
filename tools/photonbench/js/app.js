@@ -18,25 +18,59 @@
   }
 
   // ===================================================== spectral converter
-  const SPEC_FIELDS = ["wavelengthNm", "freqTHz", "energyEV", "wavenumberCm", "angularRadS", "periodFs"];
+  // Each quantity knows: how to read its SI base value out of a derived state,
+  // how to turn that base value into a frequency, and which units the user may
+  // pick. A unit's factor converts a value *in that unit* to the SI base
+  // (e.g. 1 nm = 1e-9 m), so display = baseValue / factor and base = value * factor.
+  const SPEC = {
+    wavelength: { base: (d) => d.wavelengthM,  toFreq: (m)    => O.c / m,
+      units: [["nm", 1e-9], ["µm", 1e-6], ["Å", 1e-10], ["mm", 1e-3], ["pm", 1e-12], ["m", 1]], def: "nm" },
+    frequency:  { base: (d) => d.freqHz,       toFreq: (hz)   => hz,
+      units: [["Hz", 1], ["kHz", 1e3], ["MHz", 1e6], ["GHz", 1e9], ["THz", 1e12], ["PHz", 1e15]], def: "THz" },
+    energy:     { base: (d) => d.energyJ,      toFreq: (J)    => J / O.h,
+      units: [["eV", O.qe], ["meV", O.qe * 1e-3], ["keV", O.qe * 1e3], ["J", 1]], def: "eV" },
+    wavenumber: { base: (d) => d.wavenumberM,  toFreq: (mInv) => mInv * O.c,
+      units: [["cm⁻¹", 100], ["m⁻¹", 1], ["mm⁻¹", 1000]], def: "cm⁻¹" },
+    angular:    { base: (d) => d.angularRadS,  toFreq: (w)    => w / (2 * Math.PI),
+      units: [["rad/s", 1], ["Grad/s", 1e9], ["Trad/s", 1e12], ["Prad/s", 1e15]], def: "rad/s" },
+    period:     { base: (d) => d.periodS,      toFreq: (s)    => 1 / s,
+      units: [["fs", 1e-15], ["ps", 1e-12], ["ns", 1e-9], ["µs", 1e-6], ["ms", 1e-3], ["s", 1]], def: "fs" }
+  };
+  const SPEC_Q = ["wavelength", "frequency", "energy", "wavenumber", "angular", "period"];
+  let currentNu = null;   // the single source of truth: the current frequency (Hz)
 
-  function setSpectral(fromField, value, keepEl) {
-    const d = O.spectral(fromField, value);
-    if (!d) return;
-    const vals = {
-      wavelengthNm: d.wavelengthM / 1e-9,
-      freqTHz: d.freqHz / 1e12,
-      energyEV: d.energyEV,
-      wavenumberCm: d.wavenumberCm,
-      angularRadS: d.angularRadS,
-      periodFs: d.periodS / 1e-15
-    };
-    SPEC_FIELDS.forEach((f) => {
-      const el = $("f-" + f);
-      if (el !== keepEl) el.value = fmt(vals[f]);
-    });
-    updateRuler(vals.wavelengthNm, d);
+  function unitFactor(q) {
+    const u = $("u-" + q).value;
+    const found = SPEC[q].units.find((row) => row[0] === u);
+    return found ? found[1] : 1;
   }
+
+  // Fill every field from one frequency, each in its currently-selected unit.
+  function fillFromFreq(nu, keepEl) {
+    if (!(nu > 0) || !isFinite(nu)) return;
+    currentNu = nu;
+    const d = O.deriveFromFreq(nu);
+    SPEC_Q.forEach((q) => {
+      const el = $("f-" + q);
+      if (el === keepEl) return;
+      el.value = fmt(SPEC[q].base(d) / unitFactor(q));
+    });
+    updateRuler(d.wavelengthM / 1e-9, d);
+  }
+
+  // User typed into a field → interpret the value in that field's selected unit.
+  function onSpecInput(q, el) {
+    const v = parseFloat(el.value);
+    if (!(v > 0) || !isFinite(v)) return;
+    fillFromFreq(SPEC[q].toFreq(v * unitFactor(q)), el);
+  }
+
+  // User changed a unit → physics is unchanged; just re-display in the new unit.
+  function onUnitChange() {
+    if (currentNu != null) fillFromFreq(currentNu, null);
+  }
+
+  function setByWavelengthNm(nm) { fillFromFreq(O.c / (nm * 1e-9), null); }
 
   function updateRuler(lambdaNm, d) {
     const lo = 380, hi = 750;
@@ -77,15 +111,20 @@
   }
 
   function wireSpectral() {
-    SPEC_FIELDS.forEach((f) => {
-      $("f-" + f).addEventListener("input", (e) => {
-        const v = parseFloat(e.target.value);
-        if (v > 0 && isFinite(v)) setSpectral(f, v, e.target);
+    SPEC_Q.forEach((q) => {
+      // populate the unit dropdown and select the default unit
+      const sel = $("u-" + q);
+      SPEC[q].units.forEach(([label]) => {
+        const o = document.createElement("option");
+        o.value = label; o.textContent = label;
+        if (label === SPEC[q].def) o.selected = true;
+        sel.appendChild(o);
       });
+      sel.addEventListener("change", onUnitChange);
+      $("f-" + q).addEventListener("input", (e) => onSpecInput(q, e.target));
     });
     $("f-nindex").addEventListener("input", () => {
-      const v = parseFloat($("f-wavelengthNm").value);
-      if (v > 0) setSpectral("wavelengthNm", v, null);
+      if (currentNu != null) fillFromFreq(currentNu, null);
     });
 
     const presets = [
@@ -97,7 +136,7 @@
     presets.forEach(([label, name, nm]) => {
       const b = document.createElement("button");
       b.innerHTML = `<b>${label}</b> ${name}`;
-      b.onclick = () => { setSpectral("wavelengthNm", nm, null); };
+      b.onclick = () => { setByWavelengthNm(nm); };
       wrap.appendChild(b);
     });
   }
@@ -242,7 +281,7 @@
     wireConstants();
 
     // initial state
-    setSpectral("wavelengthNm", 1550, null);
+    setByWavelengthNm(1550);
     setPower("mW", 1, null);
     $("r-ratio").value = "2"; setRatioFrom("ratio");
     $("calc-input").value = "h c / 1064nm in eV";

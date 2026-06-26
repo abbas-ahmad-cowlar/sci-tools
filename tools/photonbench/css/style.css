@@ -86,6 +86,20 @@ body {
 
 .spec-fields { display: grid; grid-template-columns: repeat(3, 1fr); gap: 13px 14px; }
 
+/* per-field unit selectors */
+.spec-fields .inwrap { gap: 6px; }
+.spec-fields .inwrap input { padding-right: 11px; flex: 1 1 auto; width: auto; min-width: 0; }
+.spec-fields select.u-sel {
+  flex: 0 0 auto;
+  font-family: var(--mono); font-size: 11px; color: var(--ink-dim);
+  background: var(--bg); border: 1px solid var(--line); border-radius: 7px;
+  padding: 8px 4px; cursor: pointer; outline: none;
+  transition: border-color .14s, color .14s;
+}
+.spec-fields select.u-sel:hover { color: var(--ink); border-color: var(--accent); }
+.spec-fields select.u-sel:focus { color: var(--ink); border-color: var(--accent); box-shadow: 0 0 0 3px rgba(232,177,58,0.12); }
+.spec-fields select.u-sel option { background: var(--panel-2); color: var(--ink); }
+
 /* ===== spectrum ruler ===== */
 .ruler { position: relative; margin: 20px 0 8px; }
 .ruler-bar { height: 16px; border-radius: 5px; border: 1px solid var(--line); background: #000; }

@@ -20,7 +20,6 @@
 <header class="topbar wrap">
   <a class="brand" href="./index.html">
     <span class="mark">Sci-Tools</span>
-    <span class="slash">// for the lab</span>
   </a>
   <span class="spacer"></span>
   <a class="ghost" href="https://github.com/abbas-ahmad-cowlar/sci-tools" target="_blank" rel="noopener">source ↗</a>
@@ -39,7 +38,6 @@
       <p class="who">Built by <b>Syed Abbas Ahmad</b> — physicist &amp; ML&nbsp;engineer.</p>
       <div class="chips">
         <span class="chip"><span class="dot"></span> Runs from <code>file://</code></span>
-        <span class="chip"><span class="dot"></span> Zero dependencies</span>
         <span class="chip"><span class="dot"></span> Open source &middot; MIT</span>
       </div>
     </div>
@@ -57,91 +55,17 @@
     </div>
   </section>
 
-  <!-- ============ TOOLS ============ -->
-  <section class="section tools">
-    <div class="section-head">
-      <span class="idx">01 — 05</span>
-      <h2>Tools</h2>
-      <span class="note">single-file calculators · open in a browser</span>
-    </div>
-    <div class="grid">
-
-      <a class="card" href="tools/bitforge/index.html">
-        <span class="num">01</span>
-        <h3 class="name">bitforge</h3>
-        <div class="kicker">register &amp; bitfield workbench</div>
-        <p class="desc">Decode a datasheet's status register, toggle bits, carve named
-          fields, and copy out the C macros. 64-bit math that doesn't silently truncate.</p>
-        <div class="meta">
-          <span class="spec">1 file · 0 deps · BigInt-exact</span>
-          <span class="open">open <span class="arr">→</span></span>
-        </div>
-      </a>
-
-      <a class="card" href="tools/propagate/index.html">
-        <span class="num">02</span>
-        <h3 class="name">propagate</h3>
-        <div class="kicker">uncertainty &amp; error budget</div>
-        <p class="desc">Type a formula and your ±1σ inputs; get the result, its propagated
-          uncertainty, and — the part people skip — which measurement to improve first.</p>
-        <div class="meta">
-          <span class="spec">57/57 tests · GUM first-order</span>
-          <span class="open">open <span class="arr">→</span></span>
-        </div>
-      </a>
-
-      <a class="card" href="tools/photonbench/index.html">
-        <span class="num">03</span>
-        <h3 class="name">photonbench</h3>
-        <div class="kicker">photonics &amp; units workbench</div>
-        <p class="desc">Convert λ ↔ ν ↔ E ↔ ν̃, do real dimensional arithmetic that refuses
-          to add metres to seconds, juggle optical power in dB, grab CODATA constants.</p>
-        <div class="meta">
-          <span class="spec">0 deps · CODATA 2018</span>
-          <span class="open">open <span class="arr">→</span></span>
-        </div>
-      </a>
-
-      <a class="card" href="tools/fitbench/index.html">
-        <span class="num">04</span>
-        <h3 class="name">fitbench</h3>
-        <div class="kicker">least-squares curve fitting</div>
-        <p class="desc">Paste two columns, pick a model, get fitted parameters <em>with
-          uncertainties</em>, goodness-of-fit, a residual plot, and runnable SciPy to
-          reproduce it.</p>
-        <div class="meta">
-          <span class="spec">0 deps · Levenberg–Marquardt</span>
-          <span class="open">open <span class="arr">→</span></span>
-        </div>
-      </a>
-
-      <a class="card" href="tools/regex-lab/index.html">
-        <span class="num">05</span>
-        <h3 class="name">regex-lab</h3>
-        <div class="kicker">regex tester &amp; explainer</div>
-        <p class="desc">See your pattern explained in plain English, drawn as a railroad
-          diagram, and matched live as you type — for the moment you're staring at someone
-          else's regex.</p>
-        <div class="meta">
-          <span class="spec">1 file · 0 deps · railroad</span>
-          <span class="open">open <span class="arr">→</span></span>
-        </div>
-      </a>
-
-    </div>
-  </section>
-
   <!-- ============ DEMOS ============ -->
   <section class="section demos">
     <div class="section-head">
-      <span class="idx">06 — 08</span>
+      <span class="idx">01 — 03</span>
       <h2>Demos</h2>
       <span class="note">interactive physics · the methods behind my paid work</span>
     </div>
     <div class="grid">
 
       <a class="card" href="demos/optimizer/index.html">
-        <span class="num">06</span>
+        <span class="num">01</span>
         <h3 class="name">Optimizer Arena</h3>
         <div class="kicker">metaheuristics on 2D landscapes</div>
         <p class="desc">PSO, Differential Evolution, Simulated Annealing and a GA hunting
@@ -155,7 +79,7 @@
       </a>
 
       <a class="card" href="demos/soliton/index.html">
-        <span class="num">07</span>
+        <span class="num">02</span>
         <h3 class="name">Soliton Lab</h3>
         <div class="kicker">nonlinear Schrödinger, live</div>
         <p class="desc">A pulse propagating down a nonlinear fibre, solved in real time by
@@ -170,7 +94,7 @@
       </a>
 
       <a class="card" href="demos/wigner/index.html">
-        <span class="num">08</span>
+        <span class="num">03</span>
         <h3 class="name">Quantum Optics</h3>
         <div class="kicker">Wigner functions of light</div>
         <p class="desc">Phase-space portraits of coherent, squeezed, thermal, Fock and cat
@@ -180,6 +104,80 @@
         <div class="meta">
           <span class="spec">Wigner · purity · negativity</span>
           <span class="open">launch <span class="arr">→</span></span>
+        </div>
+      </a>
+
+    </div>
+  </section>
+
+  <!-- ============ TOOLS ============ -->
+  <section class="section tools">
+    <div class="section-head">
+      <span class="idx">04 — 08</span>
+      <h2>Tools</h2>
+      <span class="note">single-file calculators · open in a browser</span>
+    </div>
+    <div class="grid">
+
+      <a class="card" href="tools/bitforge/index.html">
+        <span class="num">04</span>
+        <h3 class="name">bitforge</h3>
+        <div class="kicker">register &amp; bitfield workbench</div>
+        <p class="desc">Decode a datasheet's status register, toggle bits, carve named
+          fields, and copy out the C macros. 64-bit math that doesn't silently truncate.</p>
+        <div class="meta">
+          <span class="spec">1 file · 0 deps · BigInt-exact</span>
+          <span class="open">open <span class="arr">→</span></span>
+        </div>
+      </a>
+
+      <a class="card" href="tools/propagate/index.html">
+        <span class="num">05</span>
+        <h3 class="name">propagate</h3>
+        <div class="kicker">uncertainty &amp; error budget</div>
+        <p class="desc">Type a formula and your ±1σ inputs; get the result, its propagated
+          uncertainty, and — the part people skip — which measurement to improve first.</p>
+        <div class="meta">
+          <span class="spec">57/57 tests · GUM first-order</span>
+          <span class="open">open <span class="arr">→</span></span>
+        </div>
+      </a>
+
+      <a class="card" href="tools/photonbench/index.html">
+        <span class="num">06</span>
+        <h3 class="name">photonbench</h3>
+        <div class="kicker">photonics &amp; units workbench</div>
+        <p class="desc">Convert λ ↔ ν ↔ E ↔ ν̃, do real dimensional arithmetic that refuses
+          to add metres to seconds, juggle optical power in dB, grab CODATA constants.</p>
+        <div class="meta">
+          <span class="spec">0 deps · CODATA 2018</span>
+          <span class="open">open <span class="arr">→</span></span>
+        </div>
+      </a>
+
+      <a class="card" href="tools/fitbench/index.html">
+        <span class="num">07</span>
+        <h3 class="name">fitbench</h3>
+        <div class="kicker">least-squares curve fitting</div>
+        <p class="desc">Paste two columns, pick a model, get fitted parameters <em>with
+          uncertainties</em>, goodness-of-fit, a residual plot, and runnable SciPy to
+          reproduce it.</p>
+        <div class="meta">
+          <span class="spec">0 deps · Levenberg–Marquardt</span>
+          <span class="open">open <span class="arr">→</span></span>
+        </div>
+      </a>
+
+      <a class="card" href="tools/regex-lab/index.html">
+        <span class="num">08</span>
+        <h3 class="name">regex-lab</h3>
+        <div class="kicker">regex tester &amp; explainer</div>
+        <p class="desc">See your pattern explained in plain English, drawn as a railroad
+          diagram, and matched live as you type — for the moment you're staring at someone
+          else's regex.</p>
+        <div class="meta">
+          <span class="spec">1 file · 0 deps · railroad</span>
+          <span class="open">open <span class="arr">→</span></span>
         </div>
       </a>
 

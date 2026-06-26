@@ -363,6 +363,11 @@ canvas { display: block; }
 <div class="wrap">
   <!-- ============ CONTROLS ============ -->
   <div class="side">
+    <div class="btn-row">
+      <button class="btn primary grow" id="playBtn">⏸ Pause</button>
+      <button class="btn" id="restartBtn">↺ Restart</button>
+    </div>
+
     <div class="panel panel-pad">
       <h3>Initial Field</h3>
       <div class="field">
@@ -432,11 +437,6 @@ canvas { display: block; }
       <div class="readout"><span>Spectral FWHM</span><b id="rSpec">0.00</b></div>
       <div class="readout"><span>Energy ∫|u|²dτ</span><b id="rEnergy">0.00</b></div>
       <div class="readout"><span>Energy drift</span><b id="rDrift">0.0 ppm</b></div>
-    </div>
-
-    <div class="btn-row">
-      <button class="btn primary grow" id="playBtn">⏸ Pause</button>
-      <button class="btn" id="restartBtn">↺ Restart</button>
     </div>
 
     <p class="hint">

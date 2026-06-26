@@ -11,6 +11,13 @@
 </head>
 <body>
 <div id="app">
+  <style>
+  .sci-back{display:inline-flex;align-items:center;gap:7px;margin:2px 0 18px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12.5px;font-weight:600;letter-spacing:.02em;color:#aeb9c9;text-decoration:none;padding:8px 14px;border:1px solid rgba(255,255,255,.13);border-radius:999px;background:rgba(255,255,255,.025);transition:color .18s ease,border-color .18s ease,transform .18s ease}
+  .sci-back:hover{color:#fff;border-color:rgba(255,255,255,.32);transform:translateX(-2px)}
+  .sci-back svg{transition:transform .18s ease}
+  .sci-back:hover svg{transform:translateX(-3px)}
+  </style>
+  <a class="sci-back" href="../../index.html" aria-label="Back to Sci-Tools"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>Sci-Tools</a>
 
   <header class="topbar">
     <div class="brand">
@@ -32,17 +39,17 @@
 
       <div class="spec-fields">
         <div class="field"><label>wavelength λ</label>
-          <div class="inwrap"><input id="f-wavelengthNm" data-field="wavelengthNm" inputmode="decimal" autocomplete="off"><span class="u">nm</span></div></div>
+          <div class="inwrap"><input id="f-wavelength" data-q="wavelength" inputmode="decimal" autocomplete="off"><select class="u-sel" id="u-wavelength" data-q="wavelength" title="unit"></select></div></div>
         <div class="field"><label>frequency ν</label>
-          <div class="inwrap"><input id="f-freqTHz" data-field="freqTHz" inputmode="decimal" autocomplete="off"><span class="u">THz</span></div></div>
+          <div class="inwrap"><input id="f-frequency" data-q="frequency" inputmode="decimal" autocomplete="off"><select class="u-sel" id="u-frequency" data-q="frequency" title="unit"></select></div></div>
         <div class="field"><label>photon energy E</label>
-          <div class="inwrap"><input id="f-energyEV" data-field="energyEV" inputmode="decimal" autocomplete="off"><span class="u">eV</span></div></div>
+          <div class="inwrap"><input id="f-energy" data-q="energy" inputmode="decimal" autocomplete="off"><select class="u-sel" id="u-energy" data-q="energy" title="unit"></select></div></div>
         <div class="field"><label>wavenumber ν̃</label>
-          <div class="inwrap"><input id="f-wavenumberCm" data-field="wavenumberCm" inputmode="decimal" autocomplete="off"><span class="u">cm⁻¹</span></div></div>
+          <div class="inwrap"><input id="f-wavenumber" data-q="wavenumber" inputmode="decimal" autocomplete="off"><select class="u-sel" id="u-wavenumber" data-q="wavenumber" title="unit"></select></div></div>
         <div class="field"><label>angular ω</label>
-          <div class="inwrap"><input id="f-angularRadS" data-field="angularRadS" inputmode="decimal" autocomplete="off"><span class="u">rad/s</span></div></div>
+          <div class="inwrap"><input id="f-angular" data-q="angular" inputmode="decimal" autocomplete="off"><select class="u-sel" id="u-angular" data-q="angular" title="unit"></select></div></div>
         <div class="field"><label>period T</label>
-          <div class="inwrap"><input id="f-periodFs" data-field="periodFs" inputmode="decimal" autocomplete="off"><span class="u">fs</span></div></div>
+          <div class="inwrap"><input id="f-period" data-q="period" inputmode="decimal" autocomplete="off"><select class="u-sel" id="u-period" data-q="period" title="unit"></select></div></div>
       </div>
 
       <div class="ruler" id="ruler">

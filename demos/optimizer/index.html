@@ -478,6 +478,22 @@ canvas { display: block; }
   <div class="controls">
 
     <div class="panel panel-pad">
+      <div class="panel-title">Run</div>
+      <div class="btn-row">
+        <button class="btn primary grow" id="playBtn">▶ Play</button>
+        <button class="btn" id="stepBtn">Step</button>
+        <button class="btn" id="resetBtn">↻ Reset</button>
+      </div>
+      <div class="field" style="margin-top:14px;margin-bottom:0">
+        <label style="margin-bottom:4px">View</label>
+        <div class="seg">
+          <button class="chip active" id="trailsChip">Trails</button>
+          <button class="chip active" id="contoursChip">Contours</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel panel-pad">
       <div class="panel-title">Objective Function</div>
       <div class="field" style="margin-bottom:12px">
         <select id="fnSel"></select>
@@ -564,22 +580,6 @@ canvas { display: block; }
         <div class="field">
           <label>Tournament size <span class="val" id="tkVal">3</span></label>
           <input type="range" id="tk" min="2" max="8" step="1" value="3">
-        </div>
-      </div>
-    </div>
-
-    <div class="panel panel-pad">
-      <div class="panel-title">Run</div>
-      <div class="btn-row">
-        <button class="btn primary grow" id="playBtn">▶ Play</button>
-        <button class="btn" id="stepBtn">Step</button>
-        <button class="btn" id="resetBtn">↻ Reset</button>
-      </div>
-      <div class="field" style="margin-top:14px;margin-bottom:0">
-        <label style="margin-bottom:4px">View</label>
-        <div class="seg">
-          <button class="chip active" id="trailsChip">Trails</button>
-          <button class="chip active" id="contoursChip">Contours</button>
         </div>
       </div>
     </div>

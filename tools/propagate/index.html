@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Propagate — uncertainty &amp; error-budget calculator</title>
+<title>Propagate &middot; uncertainty &amp; error-budget calculator</title>
 <meta name="description" content="Offline first-order uncertainty propagation calculator with an error budget: see which measurement dominates your result's error." />
 <style>
 :root{
@@ -119,7 +119,7 @@ kbd{font-family:var(--mono);font-size:11px;background:var(--bg2);border:1px soli
   <header>
     <div class="brand">
       <h1><span class="sigma">σ</span>Propagate</h1>
-      <p>First-order uncertainty propagation &amp; error budget — fully offline.</p>
+      <p>First-order uncertainty propagation &amp; error budget, fully offline.</p>
     </div>
     <div class="head-actions">
       <select class="btn" id="examples" title="Load an example"><option value="">Examples…</option></select>
@@ -156,7 +156,7 @@ kbd{font-family:var(--mono);font-size:11px;background:var(--bg2);border:1px soli
     <div class="panel">
       <div class="panel-h"><h2>Result</h2><span class="hint" id="rel-hint"></span></div>
       <div class="result-main">
-        <div class="result-val" id="rval">—</div>
+        <div class="result-val" id="rval">·</div>
         <div class="result-sub" id="rsub"></div>
       </div>
       <div class="budget">
@@ -170,13 +170,13 @@ kbd{font-family:var(--mono);font-size:11px;background:var(--bg2);border:1px soli
     <h3>How it works</h3>
     <p>Each measured quantity carries a standard uncertainty (±1σ). Assuming the inputs are
     <em>independent</em>, the uncertainty of <code>f</code> is the root-sum-square of each variable's
-    contribution — the classic first-order propagation law:</p>
+    contribution, the classic first-order propagation law:</p>
     <span class="eq">σ_f = √( Σ (∂f/∂xᵢ · σᵢ)² )</span>
     <p>The partial slopes are found numerically with a symmetric difference at ±σ (exact for linear and
-    quadratic forms, accurate otherwise — no symbolic differentiation, no <code>eval</code>). The
+    quadratic forms, accurate otherwise, no symbolic differentiation, no <code>eval</code>). The
     <em>error budget</em> ranks each term's share of the total variance, so you can see at a glance
     <b>which measurement to improve first.</b> Math constants <code>pi, tau</code> are built in; physical
-    constants (<code>c, h, hbar, kB, NA, qe, eps0, mu0, me, g</code>) auto-fill as <em>editable</em> rows —
+    constants (<code>c, h, hbar, kB, NA, qe, eps0, mu0, me, g</code>) auto-fill as <em>editable</em> rows,
     so you can give a measured <code>g</code> its own uncertainty, or override <code>c</code>.
     Functions: <code>sqrt, exp, ln, log10, sin, cos, tan, atan2, sinh…, pow, hypot</code> and more.</p>
     <p style="color:var(--faint)">Tip: press <kbd>Tab</kbd> through the value fields; everything recomputes live.</p>

@@ -1,5 +1,5 @@
 /* =============================================================================
- * FITBENCH — models.js
+ * FITBENCH, models.js
  * The library of fittable models. Each entry knows how to evaluate itself, how
  * to guess sensible starting parameters from the data, and how to render itself
  * as a formula and as a Python/SciPy snippet.

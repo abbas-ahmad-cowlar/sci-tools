@@ -1,10 +1,10 @@
-# Sci-Tools — offline calculators for the lab
+# Sci-Tools · offline calculators for the lab
 
 A small suite of **offline, zero-dependency science &amp; engineering calculators** that run
-entirely in your browser. No install, no build step, no network calls — open them and use them.
+entirely in your browser. No install, no build step, no network calls, open them and use them.
 Nothing you type ever leaves your machine.
 
-Built by **Syed Abbas Ahmad** — physicist &amp; ML engineer.
+Built by **Syed Abbas Ahmad**: physicist &amp; ML engineer.
 
 🔗 **Live:** https://abbas-ahmad-cowlar.github.io/sci-tools/
 
@@ -22,7 +22,7 @@ Built by **Syed Abbas Ahmad** — physicist &amp; ML engineer.
 
 ## The demos
 
-Three interactive physics simulations — the numerical methods behind my paid work, made
+Three interactive physics simulations, the numerical methods behind my paid work, made
 clickable:
 
 | Demo | Method | Tied to |
@@ -37,7 +37,7 @@ clickable:
 
 Everything is static HTML/CSS/JS. Two ways to use it:
 
-- **Open in a browser.** Each tool/demo works straight from `file://` — open
+- **Open in a browser.** Each tool/demo works straight from `file://`, open
   `tools/<name>/index.html` (or `demos/<name>/index.html`) and go.
 - **Serve the folder** (only if your browser is fussy about `file://`):
 

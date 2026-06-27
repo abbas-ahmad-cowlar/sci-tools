@@ -1,5 +1,5 @@
 /* =============================================================================
- * FITBENCH — fit.js
+ * FITBENCH, fit.js
  * The numerical core: data statistics, linear least squares (normal equations),
  * Levenberg–Marquardt nonlinear least squares with a numeric Jacobian, and a
  * small, safe recursive-descent parser that turns a custom formula string into
@@ -86,7 +86,7 @@
       for (let k = 0; k < p; k++) As[j][k] = A[j][k] * d[j] * d[k];
     }
     const y = linalg.solve(As, gs);
-    if (!y) return { ok: false, message: 'Singular system — try a lower degree or more data.' };
+    if (!y) return { ok: false, message: 'Singular system, try a lower degree or more data.' };
     const beta = new Array(p);
     for (let j = 0; j < p; j++) beta[j] = y[j] * d[j];
 
@@ -120,7 +120,7 @@
     };
 
     let curCost = cost(p);
-    if (!isFinite(curCost)) return { ok: false, message: 'Initial guess gives non-finite values — check the model fits the data range.' };
+    if (!isFinite(curCost)) return { ok: false, message: 'Initial guess gives non-finite values, check the model fits the data range.' };
 
     let lambda = 1e-3;
     let iter = 0, converged = false;
@@ -190,7 +190,7 @@
   }
 
   // ===========================================================================
-  // custom formula parser  — turns "a*exp(-b*x)+c" into {fn, params:['a','b','c']}
+  // custom formula parser , turns "a*exp(-b*x)+c" into {fn, params:['a','b','c']}
   // ===========================================================================
   const FN = {
     exp: Math.exp, ln: Math.log, log: Math.log,
@@ -264,7 +264,7 @@
 
     const js = emitExpr();
     if (pos < tokens.length) throw new Error('Unexpected "' + tokens[pos].v + '"');
-    if (!params.length) throw new Error('No parameters found — use single letters (other than x) like a, b, c.');
+    if (!params.length) throw new Error('No parameters found, use single letters (other than x) like a, b, c.');
     const raw = new Function('p', 'x', 'FN', 'C', 'return (' + js + ');');
     const fn = (p, x) => raw(p, x, FN, CONST);
     return { fn, params, js };

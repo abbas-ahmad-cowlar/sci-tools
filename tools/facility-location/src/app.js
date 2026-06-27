@@ -1,8 +1,8 @@
 /* =============================================================================
- * Facility-Location Playground — app.js
+ * Facility-Location Playground, app.js
  * Canvas placement + rendering + controls. The maths lives in fl-core.js;
- * this file only draws and wires the UI. Points live in normalised [0,1]
- * world coordinates rendered inside a centred square field, so resizing and
+ * this file only draws and wires the UI. Points live in normalized [0,1]
+ * world coordinates rendered inside a centered square field, so resizing and
  * coverage circles stay geometrically honest.
  * ===========================================================================*/
 (function () {
@@ -17,7 +17,7 @@
     result: null, drag: null
   };
 
-  // ---- coordinate system: square field centred in the canvas ----------------
+  // ---- coordinate system: square field centered in the canvas ----------------
   var view = { cw: 0, ch: 0, field: 0, ox: 0, oy: 0, dpr: 1 };
   function layout() {
     var rect = canvas.getBoundingClientRect();
@@ -210,7 +210,7 @@
       $('roCeilLabel').textContent = 'build-everywhere ceiling';
       $('roCeil').textContent = fmt(res.ceiling, 2) + ' (' + (res.totalWeight ? (res.ceiling / res.totalWeight * 100).toFixed(0) : 0) + '%)';
       $('headline').innerHTML = baseImp == null ? 'Solution found.'
-        : 'Optimised siting covers <b>' + pct(baseImp) + '</b> more demand than the naive "' + res.baseline.name + '" pick.';
+        : 'Optimized siting covers <b>' + pct(baseImp) + '</b> more demand than the naive "' + res.baseline.name + '" pick.';
     } else {
       $('roObj').textContent = fmt(res.objective, 3) + ' field-units';
       $('roSecondLabel').textContent = 'mean distance';
@@ -218,16 +218,16 @@
       $('roCeilLabel').textContent = 'all-sites-open bound';
       $('roCeil').textContent = fmt(res.ceiling, 3);
       $('headline').innerHTML = baseImp == null ? 'Solution found.'
-        : 'Optimised siting cuts travel by <b>' + pct(baseImp) + '</b> vs the naive "' + res.baseline.name + '".';
+        : 'Optimized siting cuts travel by <b>' + pct(baseImp) + '</b> vs the naive "' + res.baseline.name + '".';
     }
 
     if (res.optimal) {
-      $('roSolver').innerHTML = '<span style="color:#5ad6a0">optimal</span> — exhaustive over C(n,k)=' + res.combos.toLocaleString();
+      $('roSolver').innerHTML = '<span style="color:#5ad6a0">optimal</span>, exhaustive over C(n,k)=' + res.combos.toLocaleString();
       $('gapRow').hidden = false;
       $('roGap').textContent = 'within ' + res.optimalityGapPct.toFixed(2) + '%';
       $('roGap').className = res.optimalityGapPct < 1e-6 ? 'cyan' : '';
     } else {
-      $('roSolver').innerHTML = '<span style="color:#f0b454">best found</span> — greedy + swap (C(n,k)=' + res.combos.toLocaleString() + ' too large for exact)';
+      $('roSolver').innerHTML = '<span style="color:#f0b454">best found</span>, greedy + swap (C(n,k)=' + res.combos.toLocaleString() + ' too large for exact)';
       $('gapRow').hidden = true;
     }
     $('roTime').textContent = res.elapsedMs + ' ms';

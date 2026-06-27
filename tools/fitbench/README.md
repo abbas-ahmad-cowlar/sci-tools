@@ -5,8 +5,8 @@ Paste two columns of numbers, pick a model, and get fitted parameters **with
 uncertainties**, goodness-of-fit statistics, a residual plot, and ready-to-run
 SciPy code. No install, no build step, no internet, nothing uploaded anywhere.
 
-Built for the everyday lab task of pulling numbers out of data — fluorescence
-lifetimes, spectral peak centres and widths, calibration slopes, dose-response
+Built for the everyday lab task of pulling numbers out of data, fluorescence
+lifetimes, spectral peak centers and widths, calibration slopes, dose-response
 curves.
 
 ## Run it
@@ -20,21 +20,21 @@ whole flow immediately.
 ## What it does
 
 - **Models**
-  - Linear and **Polynomial** (degree 1–10) — solved directly by linear least squares.
+  - Linear and **Polynomial** (degree 1–10), solved directly by linear least squares.
   - **Gaussian** and **Lorentzian** peaks (single and **two-peak**).
   - **Exponential decay** `a·e^(−x/τ)+c` and general `a·e^(b·x)+c`.
   - **Power law**, **Logistic/sigmoid**, **Sine**.
-  - **Custom formula** — type any `f(x)` (e.g. `a*exp(-b*x)*cos(c*x)+d`); the
+  - **Custom formula**: type any `f(x)` (e.g. `a*exp(-b*x)*cos(c*x)+d`); the
     parameters are detected automatically. Functions available: `exp, ln, log,
     log10, sin, cos, tan, sqrt, abs, erf, gauss(x,μ,σ)`, etc.
-- **Parameter uncertainties** — standard errors from the covariance matrix
+- **Parameter uncertainties**: standard errors from the covariance matrix
   (`(JᵀWJ)⁻¹·χ²/dof`, matching SciPy's `curve_fit` default), plus relative error.
-- **Goodness of fit** — R², adjusted R², RMSE, residual sum of squares, and (when
+- **Goodness of fit**: R², adjusted R², RMSE, residual sum of squares, and (when
   you provide y-errors) χ² and reduced χ².
-- **Weighted fits** — add a third column of y-errors and they're used as weights.
-- **Plot** — data with error bars, the fitted curve, and a shared-axis residuals
+- **Weighted fits**: add a third column of y-errors and they're used as weights.
+- **Plot**: data with error bars, the fitted curve, and a shared-axis residuals
   strip. Log-x / log-y toggles.
-- **Export** — copy the parameters, copy a runnable **NumPy + SciPy** snippet that
+- **Export**: copy the parameters, copy a runnable **NumPy + SciPy** snippet that
   reproduces the fit, download the fitted curve as **CSV**, or save the plot as
   **PNG**.
 

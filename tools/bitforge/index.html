@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BitForge — Register &amp; Bitfield Workbench</title>
+<title>BitForge &middot; Register &amp; Bitfield Workbench</title>
 <meta name="description" content="An offline workbench for embedded developers: multi-base conversion, an interactive register grid, 64-bit-correct bitwise math, named bitfield decoding, IEEE-754 interpretation, and C-literal export.">
 <style>
   /* ============================================================
-     BitForge — instrument-panel aesthetic.
+     BitForge, instrument-panel aesthetic.
      Dark, monospace, phosphor-green + amber on near-black.
      All offline; relies on a Windows-friendly mono stack.
      ============================================================ */
@@ -560,7 +560,7 @@ function updateChrome(){
   document.querySelectorAll('#signSeg button').forEach(b=> b.classList.toggle('active', (+b.dataset.s===1)===S.signed));
   document.querySelectorAll('#opbaseSeg button').forEach(b=> b.classList.toggle('active', +b.dataset.ob===S.operandBase));
   $('signNote').textContent = (S.signed?'signed':'unsigned')+' · '+S.width+'-bit';
-  $('floatKind').textContent = ({16:'IEEE-754 half',32:'IEEE-754 single',64:'IEEE-754 double'})[S.width]||'—';
+  $('floatKind').textContent = ({16:'IEEE-754 half',32:'IEEE-754 single',64:'IEEE-754 double'})[S.width]||'–';
   // logo bits reflect low nibble of value
   const low = Number(S.value & 0xFn);
   document.querySelectorAll('#logo i').forEach((el,idx)=>{
@@ -592,8 +592,8 @@ function renderStats(){
     `<span><span class="k">set</span> <b>${pc}</b></span>`+
     `<span><span class="k">clear</span> <b>${w-pc}</b></span>`+
     `<span><span class="k">parity</span> <b>${pc%2? 'odd':'even'}</b></span>`+
-    `<span><span class="k">MSB set</span> <b>${hi<0?'—':hi}</b></span>`+
-    `<span><span class="k">LSB set</span> <b>${lo<0?'—':lo}</b></span>`+
+    `<span><span class="k">MSB set</span> <b>${hi<0?'–':hi}</b></span>`+
+    `<span><span class="k">LSB set</span> <b>${lo<0?'–':lo}</b></span>`+
     `<span><span class="k">s/u</span> <b>${both}</b></span>`;
 }
 
@@ -984,7 +984,7 @@ function runSelfTests(){
     eq('field extract', (v>>BigInt(lo))&maskFor(fw), 0xABn);
   })();
 
-  const summ = `<div class="tsumm">${fail===0?'<span style="color:var(--accent)">● ALL TESTS PASSED</span>':'<span style="color:var(--red)">● FAILURES</span>'} — <b>${pass}</b> passed, <b>${fail}</b> failed.</div>`;
+  const summ = `<div class="tsumm">${fail===0?'<span style="color:var(--accent)">● ALL TESTS PASSED</span>':'<span style="color:var(--red)">● FAILURES</span>'}, <b>${pass}</b> passed, <b>${fail}</b> failed.</div>`;
   $('testbody').innerHTML = summ + out.join('');
   console.log(`[BitForge self-tests] ${pass} passed, ${fail} failed.` + (fail===0?' ALL TESTS PASSED':' SOME TESTS FAILED'));
   return {pass,fail};

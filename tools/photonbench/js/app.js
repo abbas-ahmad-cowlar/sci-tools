@@ -1,5 +1,5 @@
 /* =========================================================================
-   PhotonBench — UI wiring. Links the spectral fields, the live units
+   PhotonBench, UI wiring. Links the spectral fields, the live units
    calculator, the power/dB converter and the constants browser.
    ========================================================================= */
 (function () {
@@ -246,7 +246,7 @@
           const el = document.createElement("button");
           el.className = "const-item";
           el.innerHTML =
-            `<div class="ci-top"><span class="ci-name">${c.name}</span><span class="ci-unit">${c.unit || "—"}</span></div>` +
+            `<div class="ci-top"><span class="ci-name">${c.name}</span><span class="ci-unit">${c.unit || "–"}</span></div>` +
             `<div class="ci-val">${c.value}</div><div class="ci-about">${escapeHtml(c.about)}</div>`;
           el.onclick = () => insertIntoCalc(c.name);
           grid.appendChild(el);

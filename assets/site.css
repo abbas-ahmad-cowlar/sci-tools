@@ -1,5 +1,5 @@
 /* ============================================================
-   Sci-Tools — shared design system
+   Sci-Tools, shared design system
    "Precision lab instrument": ink-black bench, engineering grid,
    phosphor-cyan traces, amber for the paid-work demos.
    Serif headlines (Fraunces) over monospace detailing (Plex Mono).
@@ -23,9 +23,9 @@
   --line-strong: rgba(255,255,255,0.16);
 
   /* accents */
-  --cyan:        #57d2e8;   /* tools — phosphor */
+  --cyan:        #57d2e8;   /* tools, phosphor */
   --cyan-deep:   #2aa6c2;
-  --amber:       #f0b454;   /* demos — oscilloscope */
+  --amber:       #f0b454;   /* demos, oscilloscope */
   --amber-deep:  #c98a2e;
 
   --cyan-glow:   rgba(87,210,232,0.16);

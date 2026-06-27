@@ -1,5 +1,5 @@
 /* =========================================================================
-   PhotonBench — units-aware expression evaluator with dimensional analysis.
+   PhotonBench, units-aware expression evaluator with dimensional analysis.
    DOM-free so it can be unit-tested under Node. Attaches to window.PB.units.
 
    A quantity is { v: <SI value>, d: [m,kg,s,A,K,mol,cd] } (dimension vector).
@@ -149,7 +149,7 @@
     Ry:   { v: 2.1798723611035e-18, d: ENERGY, about: "Rydberg energy" },
     a0:   { v: 5.29177210903e-11, d: L, about: "Bohr radius" }
   };
-  // eps0 is F/m, mu0 is H/m (both per-metre) — correct the stored dimensions
+  // eps0 is F/m, mu0 is H/m (both per-meter), correct the stored dimensions
   CONSTANTS.eps0.d = dsub(CAP, L);
   CONSTANTS.mu0.d = dsub(IND, L);
 

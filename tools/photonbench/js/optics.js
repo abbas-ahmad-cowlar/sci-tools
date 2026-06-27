@@ -1,9 +1,9 @@
 /* =========================================================================
-   PhotonBench — exact optics conversions (DOM-free, testable).
+   PhotonBench, exact optics conversions (DOM-free, testable).
    - spectral(): wavelength ↔ frequency ↔ angular ω ↔ photon energy ↔
      wavenumber ↔ period, all derived from one canonical frequency.
    - power/dB helpers.
-   - wavelengthToRGB(): approximate visible colour for the spectrum ruler.
+   - wavelengthToRGB(): approximate visible color for the spectrum ruler.
    ========================================================================= */
 (function () {
   "use strict";
@@ -83,7 +83,7 @@
     return power.fromWatts(watts);
   }
 
-  // --- visible-spectrum colour (≈ Bruton's algorithm) -----------------------
+  // --- visible-spectrum color (≈ Bruton's algorithm) -----------------------
   function wavelengthToRGB(nm) {
     let r = 0, g = 0, b = 0;
     if (nm >= 380 && nm < 440) { r = -(nm - 440) / 60; b = 1; }
@@ -117,7 +117,7 @@
     if (nm < 625) return "orange";
     if (nm <= 750) return "red";
     if (nm < 1260) return "near-IR";
-    if (nm < 1675) return "SWIR · fibre telecom";
+    if (nm < 1675) return "SWIR · fiber telecom";
     if (nm < 3000) return "short-wave IR";
     if (nm < 8000) return "mid-IR";
     if (nm < 1e6) return "far-IR / THz";

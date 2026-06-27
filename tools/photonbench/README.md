@@ -1,10 +1,10 @@
-# PhotonBench — a photonics &amp; units workbench
+# PhotonBench, a photonics &amp; units workbench
 
 A fast, offline desk tool for anyone working in optics/photonics. Convert
 between the ways we describe light, do dimensional arithmetic, juggle optical
-power in dB, and grab physical constants — all in one local page.
+power in dB, and grab physical constants, all in one local page.
 
-Open `index.html`. No build, no dependencies, no network — fonts are bundled
+Open `index.html`. No build, no dependencies, no network, fonts are bundled
 locally with the suite. Everything runs in the browser.
 
 ## What's inside
@@ -33,8 +33,8 @@ kB * 300K in eV         → 0.025852 eV      (thermal energy at 300 K)
 
 It understands SI prefixes (`nm`, `THz`, `µW`, `pF`, …), implicit
 multiplication (`h c / L`), `^` powers, parentheses, and the usual functions
-(`sin`, `sqrt`, `ln`, `exp`, …). It refuses to add metres to seconds, and it
-won't silently "convert" incompatible dimensions — if you ask for
+(`sin`, `sqrt`, `ln`, `exp`, …). It refuses to add meters to seconds, and it
+won't silently "convert" incompatible dimensions, if you ask for
 `1550 nm to THz` it tells you that's a length↔frequency mismatch (use the
 spectral converter, which knows the *c* relation).
 
@@ -51,7 +51,7 @@ index.html
 css/style.css
 js/
   units.js    dimensional-analysis expression evaluator (DOM-free, tested)
-  optics.js   exact spectral + power/dB conversions, spectrum colour (DOM-free, tested)
+  optics.js   exact spectral + power/dB conversions, spectrum color (DOM-free, tested)
   app.js      UI wiring
 ```
 
@@ -75,4 +75,4 @@ console.log(PB.optics.spectral('wavelengthNm', 532).energyEV);  // 2.33053
 - Constants are CODATA 2018. The elementary charge is `qe` (since `e` is
   Euler's number) and standard gravity is `g0` (since `g` is gram).
 
-*Part of the [Sci-Tools](../../) suite — offline calculators for the lab.*
+*Part of the [Sci-Tools](../../) suite, offline calculators for the lab.*

@@ -1,8 +1,8 @@
 /* =============================================================================
- * FITBENCH — plot.js
+ * FITBENCH, plot.js
  * A small dependency-free plotter. Draws the data (with optional y-error bars),
  * the fitted curve, and a residuals strip that shares the x-axis, all on one
- * DPR-aware canvas. Supports log x/y axes. Colours are read from CSS custom
+ * DPR-aware canvas. Supports log x/y axes. Colors are read from CSS custom
  * properties so the plot tracks the page theme.
  * ===========================================================================*/
 (function (FB) {

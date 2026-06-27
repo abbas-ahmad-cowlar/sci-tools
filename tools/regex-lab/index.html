@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Regex Lab — dissect, test &amp; understand regular expressions</title>
+<title>Regex Lab &middot; dissect, test &amp; understand regular expressions</title>
 <meta name="description" content="An offline workbench for regular expressions: live testing, plain-English explanations, railroad diagrams, capture groups and substitution preview." />
 <link rel="stylesheet" href="../../assets/fonts.css">
 <style>
 /* ============================================================
-   REGEX LAB — a precision instrument for regular expressions
+   REGEX LAB, a precision instrument for regular expressions
    Single-file, offline-capable. Aesthetic: dark "lab bench",
    phosphor-lime signal on warm near-black, technical mono type.
    ============================================================ */
@@ -119,7 +119,7 @@ header.top{display:flex;align-items:flex-end;justify-content:space-between;gap:2
 }
 #pattern::placeholder{color:var(--ink-faint)}
 .flags-box{display:flex;align-items:center;padding:0 10px;font-family:var(--font-mono);font-size:15px;color:var(--amber);min-width:34px}
-.flags-box:empty::after{content:"—";color:var(--ink-faint)}
+.flags-box:empty::after{content:"–";color:var(--ink-faint)}
 .copy-regex{display:flex;align-items:center;padding:0 14px;background:rgba(182,242,74,.04);border:0;border-left:1px solid var(--border);color:var(--ink-faint);cursor:pointer;transition:.15s}
 .copy-regex:hover{color:var(--acid);background:rgba(182,242,74,.1)}
 .copy-regex svg{width:16px;height:16px}
@@ -403,7 +403,7 @@ footer.foot b{color:var(--acid-deep)}
   </div>
 
   <footer class="foot">
-    <div><b>Regex Lab</b> — a single offline file. Everything runs locally in your browser; nothing is sent anywhere.</div>
+    <div><b>Regex Lab</b>, a single offline file. Everything runs locally in your browser; nothing is sent anywhere.</div>
     <div style="margin-top:6px">Patterns are tested with the JavaScript regex engine · state is saved to this URL &amp; to local storage.</div>
   </footer>
 </div>
@@ -543,7 +543,7 @@ function parseRegex(src){
       } else fail('Invalid group construct "(?' + (n||'') + '"');
     } else { groupCount++; num = groupCount; }
     const body = parseAlternation();
-    if (peek() === ')') i++; else fail('Unclosed group — missing ")"');
+    if (peek() === ')') i++; else fail('Unclosed group, missing ")"');
     return { type:'group', kind, name, num, body };
   }
   function classAtom(){
@@ -577,7 +577,7 @@ function parseRegex(src){
         }
       } else parts.push(item);
     }
-    if (peek() === ']') i++; else fail('Unclosed character class — missing "]"');
+    if (peek() === ']') i++; else fail('Unclosed character class, missing "]"');
     return { type:'class', negated, parts };
   }
   function parseEscape(){
@@ -634,7 +634,7 @@ function classToText(node){
 function quantText(node){
   const {min,max,lazy} = node;
   let base;
-  if (min===0 && max===1) base = 'optional — appears <b>0 or 1</b> time';
+  if (min===0 && max===1) base = 'optional, appears <b>0 or 1</b> time';
   else if (min===0 && max===Infinity) base = 'repeated <b>zero or more</b> times';
   else if (min===1 && max===Infinity) base = 'repeated <b>one or more</b> times';
   else if (max===Infinity) base = 'repeated <b>' + min + ' or more</b> times';
@@ -715,7 +715,7 @@ function explainSeq(items){
     else { flush(); out.push(explainNode(it)); }
   }
   flush();
-  if (out.length === 0) return '<span class="desc">empty — matches an empty string</span>';
+  if (out.length === 0) return '<span class="desc">empty, matches an empty string</span>';
   return out.join('');
 }
 function kindLabel(q){
@@ -741,7 +741,7 @@ function leaf(cls, tag, descHtml, token){
 function renderExplain(){
   const src = els.pattern.value;
   const pane = els.panes.explain;
-  if (!src){ pane.innerHTML = emptyState('Type a pattern above and its anatomy appears here — every token explained in plain English.'); return; }
+  if (!src){ pane.innerHTML = emptyState('Type a pattern above and its anatomy appears here, every token explained in plain English.'); return; }
   let ast;
   try { ast = parseRegex(src); }
   catch(e){ pane.innerHTML = `<div class="empty">⚠ Couldn’t parse this pattern for explanation.<br><span style="color:var(--rose)">${escHtml(e.message)}</span></div>`; return; }
@@ -959,7 +959,7 @@ function renderDiagram(){
   if (!src){ pane.innerHTML = emptyState('A railroad diagram of your pattern will be drawn here. Read it left-to-right; any path through the rails is a valid match.'); return; }
   let ast;
   try { ast = parseRegex(src); }
-  catch(e){ pane.innerHTML = `<div class="empty">⚠ Diagram unavailable — ${escHtml(e.message)}</div>`; return; }
+  catch(e){ pane.innerHTML = `<div class="empty">⚠ Diagram unavailable, ${escHtml(e.message)}</div>`; return; }
   const root = layout(ast);
   const pad = 24;
   const startStub = 16, endStub = 16;
@@ -1071,9 +1071,9 @@ function renderMatches(){
     if (mt.groups.length){
       groupHtml = '<div class="groups">' + mt.groups.map((g,gi)=>{
         const namedKey = mt.named ? Object.keys(mt.named).find(k=>mt.named[k]===g) : null;
-        return `<div class="grp"><span class="gi">$${gi+1}</span>${namedKey?`<span class="gn">${escHtml(namedKey)}</span>`:''}<span class="gv">${g===undefined?'<span class="empty-grp">— (no match)</span>':escHtml(g)}</span></div>`;
+        return `<div class="grp"><span class="gi">$${gi+1}</span>${namedKey?`<span class="gn">${escHtml(namedKey)}</span>`:''}<span class="gv">${g===undefined?'<span class="empty-grp">– (no match)</span>':escHtml(g)}</span></div>`;
       }).join('') + '</div>';
-    } else groupHtml = '<span class="ix">—</span>';
+    } else groupHtml = '<span class="ix">·</span>';
     rows += `<tr><td class="ix">${idx+1}</td><td class="ix">${mt.index}</td><td><span class="mval">${escHtml(mt.value)||'∅'}</span></td><td>${groupHtml}</td></tr>`;
   });
   const more = lastMatches.length>500 ? `<div style="color:var(--ink-faint);font-family:var(--font-mono);font-size:11px;padding:10px 2px">… and ${lastMatches.length-500} more (showing first 500)</div>` : '';
@@ -1180,7 +1180,7 @@ els.test.addEventListener('input', schedule);
 const LIBRARY = [
   { name:'Email address', flags:'gi', desc:'A practical (not RFC-perfect) email matcher.',
     pattern:'([a-z0-9._%+-]+)@([a-z0-9.-]+)\\.([a-z]{2,})',
-    test:'Reach me at jane.doe@example.com or sales@sub.domain.co.uk — not "bad@@x".' },
+    test:'Reach me at jane.doe@example.com or sales@sub.domain.co.uk, not "bad@@x".' },
   { name:'URL', flags:'gi', desc:'http/https URLs with optional path & query.',
     pattern:'https?:\\/\\/[^\\s/$.?#].[^\\s]*',
     test:'Docs: https://example.com/path?q=1#frag and http://a.io. Plain text http:// is skipped.' },
@@ -1360,7 +1360,7 @@ function fallbackCopy(text, done){
   const ta = document.createElement('textarea');
   ta.value = text; ta.style.position='fixed'; ta.style.top='-1000px'; ta.style.opacity='0';
   document.body.appendChild(ta); ta.focus(); ta.select();
-  try { document.execCommand('copy'); done(); } catch(e){ toast('Copy failed — select &amp; copy manually'); }
+  try { document.execCommand('copy'); done(); } catch(e){ toast('Copy failed, select &amp; copy manually'); }
   document.body.removeChild(ta);
 }
 $('#btn-copy-link').addEventListener('click', ()=>{ saveState(); copyText(location.href, 'Shareable link copied'); });

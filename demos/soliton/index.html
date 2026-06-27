@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Soliton Lab — Sci-Tools</title>
+<title>Soliton Lab · Sci-Tools</title>
 <style data-inlined="lab.css">
 /* ============================================================
-   THE MIDNIGHT LAB — shared design system
-   "Aurora over a midnight sea" — dark, luminous, scientific.
+   THE MIDNIGHT LAB, shared design system
+   "Aurora over a midnight sea", dark, luminous, scientific.
    Fully self-contained: system fonts only, no external assets.
    ============================================================ */
 
@@ -377,8 +377,8 @@ canvas { display: block; }
       <div class="field">
         <label><span>Pulse shape</span></label>
         <select id="shape">
-          <option value="sech">Soliton — N·sech(τ)</option>
-          <option value="gauss">Gaussian — exp(−τ²/2)</option>
+          <option value="sech">Soliton, N·sech(τ)</option>
+          <option value="gauss">Gaussian, exp(−τ²/2)</option>
           <option value="collide">Two-soliton collision</option>
           <option value="mi">CW + noise (mod. instability)</option>
           <option value="pair">Soliton + soliton (bound)</option>
@@ -444,8 +444,8 @@ canvas { display: block; }
     </div>
 
     <p class="hint">
-      Watch a pulse propagate down a nonlinear fibre. A <b>fundamental soliton</b> (N=1) keeps its
-      shape forever — dispersion and self-phase-modulation cancel exactly. Higher orders
+      Watch a pulse propagate down a nonlinear fiber. A <b>fundamental soliton</b> (N=1) keeps its
+      shape forever, dispersion and self-phase-modulation cancel exactly. Higher orders
       <b>breathe</b>; in normal dispersion the pulse just spreads. The energy drift readout is your
       numerical conscience: split-step Fourier conserves it to ~ppm.
     </p>
@@ -454,11 +454,11 @@ canvas { display: block; }
   <!-- ============ DISPLAY ============ -->
   <div class="main">
     <div class="stage" style="position:relative;">
-      <div class="stage-label">Evolution &nbsp;|u(τ, ξ)|² &nbsp;— propagation distance increases downward</div>
+      <div class="stage-label">Evolution &nbsp;|u(τ, ξ)|²&nbsp;: propagation distance increases downward</div>
       <canvas id="waterfall"></canvas>
     </div>
     <div class="stage" style="position:relative;">
-      <div class="stage-label">Current profile — intensity (cyan) &amp; phase (violet) · spectrum (amber)</div>
+      <div class="stage-label">Current profile, intensity (cyan) &amp; phase (violet) · spectrum (amber)</div>
       <canvas id="profile"></canvas>
     </div>
   </div>

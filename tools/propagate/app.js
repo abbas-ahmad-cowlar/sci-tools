@@ -1,4 +1,4 @@
-/* Propagate — UI layer. Wires the DOM to the engine in propagate.js. */
+/* Propagate, UI layer. Wires the DOM to the engine in propagate.js. */
 "use strict";
 (function () {
   const P = window.Propagate;
@@ -28,7 +28,7 @@
   /* ---------- helpers ---------- */
   function num(s) { if (s == null || s === "") return NaN; const v = Number(s); return v; }
   function trim(x) {
-    if (!isFinite(x)) return "—";
+    if (!isFinite(x)) return "–";
     if (x === 0) return "0";
     const a = Math.abs(x);
     if (a >= 1e5 || a < 1e-3) return x.toExponential(2).replace("e+", "e");
@@ -73,7 +73,7 @@
     const inp = document.createElement("input");
     inp.className = "vin" + (cls === "unit" ? " unit" : "");
     inp.value = s[key];
-    inp.placeholder = key === "unit" ? "—" : ph;
+    inp.placeholder = key === "unit" ? "–" : ph;
     inp.spellcheck = false; inp.autocomplete = "off";
     inp.addEventListener("input", () => { s[key] = inp.value; compute(); });
     td.appendChild(inp);
@@ -94,7 +94,7 @@
     }
     exprEl.classList.remove("err");
     msgEl.classList.add("okmsg");
-    msgEl.textContent = compiled.vars.length ? `${compiled.vars.length} variable${compiled.vars.length > 1 ? "s" : ""}: ${compiled.vars.join(", ")}` : "no variables — constant expression";
+    msgEl.textContent = compiled.vars.length ? `${compiled.vars.length} variable${compiled.vars.length > 1 ? "s" : ""}: ${compiled.vars.join(", ")}` : "no variables, constant expression";
     lastVars = compiled.vars;
     renderVars(compiled.vars);
     compute();
@@ -117,7 +117,7 @@
     lastResult = res;
 
     if (missing) { showPlaceholder("enter all values"); return; }
-    if (!res || !res.ok) { showPlaceholder("undefined — check the expression or domain"); return; }
+    if (!res || !res.ok) { showPlaceholder("undefined, check the expression or domain"); return; }
 
     const sig = parseInt(sigSel.value, 10) || 2;
     const f = P.format(res.value, res.sigma, sig);
@@ -191,7 +191,7 @@
       exEl.appendChild(o);
     });
     exEl.addEventListener("change", () => {
-      if (exEl.value === "") return;            // placeholder picked — do nothing
+      if (exEl.value === "") return;            // placeholder picked, do nothing
       const ex = EXAMPLES[+exEl.value];
       if (!ex) return;
       exprEl.value = ex.expr;

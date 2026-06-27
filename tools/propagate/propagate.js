@@ -1,5 +1,5 @@
 /* ============================================================
-   PROPAGATE — core engine
+   PROPAGATE, core engine
    A small, safe (no eval) math expression parser + evaluator,
    plus first-order uncertainty propagation with an error budget.
 
@@ -12,7 +12,7 @@
   /* ---------- constants & functions available in expressions ----------
      Only pure-math constants are hard-wired (nobody measures π). Physical
      constants like c, h, g, e collide with common variable names (local
-     gravity g, charge e, concentration c…), so they are NOT reserved here —
+     gravity g, charge e, concentration c…), so they are NOT reserved here,
      instead PHYS gives the UI default values to pre-fill an editable row,
      which the user can override or attach an uncertainty to. */
   const CONST = { pi: Math.PI, PI: Math.PI, tau: 2 * Math.PI };
@@ -98,7 +98,7 @@
 
     // Only +,-,*,/ go through precedence climbing. Exponentiation is handled
     // separately so it binds tighter than unary minus on the base but accepts
-    // a unary exponent — i.e. -2^2 = -(2^2) = -4 and 2^-3 = 1/8, matching
+    // a unary exponent, i.e. -2^2 = -(2^2) = -4 and 2^-3 = 1/8, matching
     // Python/NumPy, and 2^3^2 = 2^9 (right associative).
     const BIN = { "+": 1, "-": 1, "*": 2, "/": 2 };
 
@@ -279,7 +279,7 @@
 
   function format(value, sigma, sig) {
     sig = sig || 2;
-    if (!isFinite(value)) return { value: "—", sigma: "—", exp: null, combined: "—" };
+    if (!isFinite(value)) return { value: "–", sigma: "–", exp: null, combined: "–" };
     if (!(sigma > 0) || !isFinite(sigma)) {
       const s = trimNum(value);
       return { value: s, sigma: "0", exp: null, combined: s };

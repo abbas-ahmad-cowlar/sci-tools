@@ -1,5 +1,5 @@
 /* =============================================================================
- * FITBENCH — app.js
+ * FITBENCH, app.js
  * Glue: parse pasted/loaded data, pick a model, run the fit, render the
  * parameter table + goodness-of-fit, drive the plot, and export results
  * (fit curve CSV, plot PNG, and a runnable SciPy snippet).
@@ -14,7 +14,7 @@
   // ---- number formatting ---------------------------------------------------
   function sig(v, n) {
     n = n || 6;
-    if (v === null || v === undefined || !isFinite(v)) return '—';
+    if (v === null || v === undefined || !isFinite(v)) return '–';
     if (v === 0) return '0';
     const a = Math.abs(v);
     if (a >= 1e6 || a < 1e-4) return v.toExponential(Math.min(n - 1, 4));
@@ -110,8 +110,8 @@
       const v = result.params[i], e = result.errors[i];
       const rel = isFinite(e) && v !== 0 ? (Math.abs(e / v) * 100) : NaN;
       html += '<tr><td class="pname">' + escapeHtml(names[i]) + '</td><td class="pval">' + sig(v) +
-        '</td><td class="perr">' + (isFinite(e) ? '± ' + sig(e, 3) : '—') +
-        '</td><td class="prel">' + (isFinite(rel) ? rel.toFixed(1) + '%' : '—') + '</td></tr>';
+        '</td><td class="perr">' + (isFinite(e) ? '± ' + sig(e, 3) : '–') +
+        '</td><td class="prel">' + (isFinite(rel) ? rel.toFixed(1) + '%' : '–') + '</td></tr>';
     }
     html += '</tbody></table>';
     if (model.note) html += '<div class="mnote">' + escapeHtml(model.note) + '</div>';

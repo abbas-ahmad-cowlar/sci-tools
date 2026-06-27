@@ -1,5 +1,5 @@
 /* =============================================================================
- * Facility-Location Playground — core.test.js
+ * Facility-Location Playground, core.test.js
  * Golden cases (hand-computed optima) + property tests over random instances.
  * Zero dependencies:  node test/core.test.js
  * ===========================================================================*/
@@ -35,14 +35,14 @@ function pmedObj(sel, demand, sites, w) {
   var sites = [{ x: 0, y: 0 }, { x: 10, y: 0 }, { x: 0, y: 10 }, { x: 10, y: 10 }, { x: 5, y: 5 }];
   var w = [1, 1, 1, 1];
 
-  // R=7.5, k=1: only the centre (idx 4, dist 7.07 to every corner) covers all four.
+  // R=7.5, k=1: only the center (idx 4, dist 7.07 to every corner) covers all four.
   var r1 = FL.solve({ demand: demand, sites: sites }, { problem: 'mclp', k: 1, R: 7.5 });
   ok(r1.optimal === true, 'MCLP golden: exact ran (small instance)');
   ok(approx(r1.objective, 4), 'MCLP golden k=1 R=7.5: optimum covers all 4 (got ' + r1.objective + ')');
-  ok(r1.selected.length === 1 && r1.selected[0] === 4, 'MCLP golden k=1: picks the centre site');
+  ok(r1.selected.length === 1 && r1.selected[0] === 4, 'MCLP golden k=1: picks the center site');
   ok(approx(r1.ceiling, 4), 'MCLP golden: build-everywhere ceiling = 4');
 
-  // R=5, k=2: corners only cover themselves; centre covers none → best = 2.
+  // R=5, k=2: corners only cover themselves; center covers none → best = 2.
   var r2 = FL.solve({ demand: demand, sites: sites }, { problem: 'mclp', k: 2, R: 5 });
   ok(approx(r2.objective, 2), 'MCLP golden k=2 R=5: optimum = 2 (got ' + r2.objective + ')');
   ok(approx(r2.ceiling, 4), 'MCLP golden R=5: ceiling (all sites) = 4');
@@ -59,13 +59,13 @@ function pmedObj(sel, demand, sites, w) {
   var demand = [{ x: 0, y: 0 }, { x: 10, y: 0 }, { x: 0, y: 10 }, { x: 10, y: 10 }];
   var sites = [{ x: 0, y: 0 }, { x: 10, y: 0 }, { x: 0, y: 10 }, { x: 10, y: 10 }, { x: 5, y: 5 }];
 
-  // k=1: centre minimises total distance (4 × 7.0711 = 28.284) vs any corner (34.14).
+  // k=1: center minimizes total distance (4 × 7.0711 = 28.284) vs any corner (34.14).
   var r1 = FL.solve({ demand: demand, sites: sites }, { problem: 'pmedian', k: 1 });
   ok(r1.optimal === true, 'p-median golden: exact ran');
-  ok(r1.selected.length === 1 && r1.selected[0] === 4, 'p-median golden k=1: picks the centre');
+  ok(r1.selected.length === 1 && r1.selected[0] === 4, 'p-median golden k=1: picks the center');
   ok(approx(r1.objective, 4 * Math.SQRT2 * 5, 1e-6), 'p-median golden k=1: objective = 28.284 (got ' + r1.objective.toFixed(4) + ')');
 
-  // k=2: two opposite corners give 0 for two points and 10 for the other two → 20; better than centre-based.
+  // k=2: two opposite corners give 0 for two points and 10 for the other two → 20; better than center-based.
   var r2 = FL.solve({ demand: demand, sites: sites }, { problem: 'pmedian', k: 2 });
   ok(r2.objective <= 20 + 1e-9, 'p-median golden k=2: optimum ≤ 20 (got ' + r2.objective.toFixed(4) + ')');
 

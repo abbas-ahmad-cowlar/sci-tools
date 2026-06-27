@@ -3,11 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Optimizer Arena — Sci-Tools</title>
+<title>Optimizer Arena · Sci-Tools</title>
 <style data-inlined="lab.css">
 /* ============================================================
-   THE MIDNIGHT LAB — shared design system
-   "Aurora over a midnight sea" — dark, luminous, scientific.
+   THE MIDNIGHT LAB, shared design system
+   "Aurora over a midnight sea", dark, luminous, scientific.
    Fully self-contained: system fonts only, no external assets.
    ============================================================ */
 
@@ -317,7 +317,7 @@ canvas { display: block; }
     min-height: 0;
   }
 
-  /* control column — grows with its content; the page scrolls to reveal it */
+  /* control column, grows with its content; the page scrolls to reveal it */
   .controls {
     width: 312px;
     flex: 0 0 312px;
@@ -327,7 +327,7 @@ canvas { display: block; }
     padding-right: 4px;
   }
 
-  /* arena column — a stable, viewport-relative height keeps the canvas crisp */
+  /* arena column, a stable, viewport-relative height keeps the canvas crisp */
   .arena {
     flex: 1;
     display: flex;
@@ -607,11 +607,11 @@ canvas { display: block; }
       <div class="panel panel-pad legend-panel">
         <div class="panel-title">Live Telemetry</div>
         <div class="readout"><span>iteration</span><b id="roIter">0</b></div>
-        <div class="readout"><span>best fitness</span><b class="amber" id="roBest">—</b></div>
-        <div class="readout"><span>best x</span><b id="roBx">—</b></div>
-        <div class="readout"><span>best y</span><b id="roBy">—</b></div>
-        <div class="readout"><span>mean fitness</span><b class="violet" id="roMean">—</b></div>
-        <div class="readout"><span id="roExtraLbl">—</span><b id="roExtra">—</b></div>
+        <div class="readout"><span>best fitness</span><b class="amber" id="roBest">·</b></div>
+        <div class="readout"><span>best x</span><b id="roBx">·</b></div>
+        <div class="readout"><span>best y</span><b id="roBy">·</b></div>
+        <div class="readout"><span>mean fitness</span><b class="violet" id="roMean">·</b></div>
+        <div class="readout"><span id="roExtraLbl">·</span><b id="roExtra">·</b></div>
 
         <div style="margin-top:14px">
           <div class="lg-row" style="color:var(--aurora-amber)"><span class="lg-ring"></span><span style="color:var(--ink-dim)">global best particle</span></div>
@@ -630,7 +630,7 @@ canvas { display: block; }
 <script>
 "use strict";
 /* ============================================================
-   Optimizer Arena — metaheuristics on 2D landscapes
+   Optimizer Arena, metaheuristics on 2D landscapes
    All math is textbook-standard. Minimization throughout.
    ============================================================ */
 
@@ -737,17 +737,17 @@ const FUNCTIONS = {
 const FN_ORDER = ["rastrigin", "ackley", "rosenbrock", "sphere", "himmelblau", "schwefel", "eggholder"];
 
 const HINTS = {
-  rastrigin: "Rastrigin is a minefield of local minima on a smooth bowl — watch a healthy swarm tunnel through the egg-carton ripples to the single global optimum at the origin.",
+  rastrigin: "Rastrigin is a minefield of local minima on a smooth bowl, watch a healthy swarm tunnel through the egg-carton ripples to the single global optimum at the origin.",
   ackley: "Ackley is nearly flat far out, then plunges sharply at the center. Algorithms that explore widely find the funnel; greedy ones can stall on the plateau.",
-  rosenbrock: "Rosenbrock's banana valley is easy to enter but the floor barely slopes toward (1,1). Watch how slowly best-fitness crawls — classic ill-conditioning.",
+  rosenbrock: "Rosenbrock's banana valley is easy to enter but the floor barely slopes toward (1,1). Watch how slowly best-fitness crawls, classic ill-conditioning.",
   sphere: "Sphere is the trivial convex bowl: every algorithm should converge cleanly to the origin. Use it as a sanity check on your hyperparameters.",
-  himmelblau: "Himmelblau has four equal global minima. Notice the swarm split or commit — different runs settle on different basins.",
+  himmelblau: "Himmelblau has four equal global minima. Notice the swarm split or commit, different runs settle on different basins.",
   schwefel: "Schwefel's optimum sits in a far corner near (421,421), deceptively distant from the deep-looking trap at the center. Exploration matters here.",
   eggholder: "Eggholder is brutally rugged with the global minimum jammed against the boundary at (512,404). Expect noisy convergence and frequent re-ranking."
 };
 
 // ============================================================
-//  COLORMAP — viridis-like (perceptually-ordered), precomputed
+//  COLORMAP, viridis-like (perceptually-ordered), precomputed
 // ============================================================
 const VIRIDIS = [
   [68, 1, 84],[71, 13, 96],[72, 24, 106],[72, 35, 116],[71, 45, 123],
@@ -837,7 +837,7 @@ function objToPx(x, y) {
 // ============================================================
 function buildHeatmap() {
   const fn = P();
-  // Render at a moderate grid then scale up — fast & smooth.
+  // Render at a moderate grid then scale up, fast & smooth.
   const GW = Math.max(2, Math.min(420, Math.round(LW / 2)));
   const GH = Math.max(2, Math.min(420, Math.round(LH / 2)));
   heatCanvas.width = GW;
@@ -1032,7 +1032,7 @@ function stepDE() {
     // mutant
     const mx = A.x + F * (B.x - C.x);
     const my = A.y + F * (B.y - C.y);
-    // binomial crossover — ensure at least one dimension comes from mutant (jrand)
+    // binomial crossover, ensure at least one dimension comes from mutant (jrand)
     const jrand = (Math.random() * 2) | 0;
     let tx = X.x, ty = X.y;
     if (Math.random() < CR || jrand === 0) tx = mx;
@@ -1059,7 +1059,7 @@ function stepSA() {
   const stepScale = +els.saStep.value * (fn.hi - fn.lo);
   const T = Math.max(saT, 1e-9);
   for (const m of pop) {
-    // propose Gaussian neighbour from current accepted state
+    // propose Gaussian neighbor from current accepted state
     const nx = clamp(m.cx + randn() * stepScale, fn.lo, fn.hi);
     const ny = clamp(m.cy + randn() * stepScale, fn.lo, fn.hi);
     const nf = fn.f(nx, ny);
@@ -1352,7 +1352,7 @@ function drawConvergence() {
 //  READOUTS
 // ============================================================
 function fmt(v, p = 4) {
-  if (!isFinite(v)) return '—';
+  if (!isFinite(v)) return '–';
   const a = Math.abs(v);
   if (a !== 0 && (a < 1e-3 || a >= 1e6)) return v.toExponential(2);
   return v.toFixed(p);

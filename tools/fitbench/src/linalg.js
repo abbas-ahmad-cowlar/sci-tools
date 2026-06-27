@@ -1,5 +1,5 @@
 /* =============================================================================
- * FITBENCH — linalg.js
+ * FITBENCH, linalg.js
  * Minimal dense linear algebra: Gaussian elimination with partial pivoting for
  * solving systems and inverting small matrices. Used for the normal equations
  * of linear fits and for the covariance matrix (JᵀJ)⁻¹ of nonlinear fits.

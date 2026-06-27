@@ -1,12 +1,12 @@
 /* =============================================================================
- * Facility-Location Playground — fl-core.js
+ * Facility-Location Playground, fl-core.js
  *
  * The DOM-free solver core. Two classic facility-location problems on a plane:
  *
  *   MCLP (Maximum Covering Location Problem)
- *       choose k sites to MAXIMISE the demand weight within radius R of an open site.
+ *       choose k sites to MAXIMIZE the demand weight within radius R of an open site.
  *   p-median
- *       choose k sites to MINIMISE the demand-weighted distance to the nearest open site.
+ *       choose k sites to MINIMIZE the demand-weighted distance to the nearest open site.
  *
  * For each problem we provide a greedy baseline, a multi-start swap local search
  * (Teitz–Bart vertex substitution for p-median; remove-one/add-one for MCLP), and an
@@ -16,10 +16,10 @@
  *   - optimalityGapPct : how far the heuristic is from the proven optimum.
  *                        Present ONLY when the exact optimum was computed.
  *   - baseline         : a DETERMINISTIC naive policy (no RNG), reported as the
- *                        improvement of the optimised solution over it.
+ *                        improvement of the optimized solution over it.
  * "Build-everywhere" is reported separately as a ceiling/bound reference only.
  *
- * Pure logic, no DOM — runnable headless under Node (see test/core.test.js).
+ * Pure logic, no DOM, runnable headless under Node (see test/core.test.js).
  * ===========================================================================*/
 (function (root, factory) {
   'use strict';

@@ -1,4 +1,4 @@
-/* Self-hosted fonts (latin subset) — the suite makes no network requests.
+/* Self-hosted fonts (latin subset), the suite makes no network requests.
    url()s resolve relative to this file, so this works from any page depth. */
 
 @font-face { font-family: "Fraunces"; font-style: normal; font-weight: 500; font-display: swap;

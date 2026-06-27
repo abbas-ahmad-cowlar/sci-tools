@@ -202,6 +202,38 @@ body {
 @keyframes draw  { to { stroke-dashoffset: 0; } }
 @keyframes probe { to { opacity: 1; } }
 
+/* ---- featured flagship card ------------------------------ */
+.featured {
+  display: grid; grid-template-columns: 1fr auto; gap: 24px; align-items: center;
+  margin: 8px 0 10px; padding: 26px 28px;
+  text-decoration: none; color: inherit;
+  border: 1px solid color-mix(in srgb, var(--cyan) 32%, var(--line-strong));
+  border-radius: 16px;
+  background:
+    radial-gradient(120% 140% at 100% 0%, rgba(87,210,232,0.10), transparent 55%),
+    linear-gradient(180deg, var(--panel-2), var(--panel));
+  box-shadow: 0 30px 70px -44px rgba(0,0,0,0.9), inset 0 1px 0 rgba(255,255,255,0.03);
+  transition: transform .26s var(--ease), border-color .26s var(--ease), box-shadow .26s var(--ease);
+}
+.featured:hover { transform: translateY(-3px); border-color: color-mix(in srgb, var(--cyan) 60%, var(--line-strong)); box-shadow: 0 36px 80px -40px rgba(0,0,0,0.95); }
+.featured-tag {
+  font-family: var(--mono); font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--cyan); margin-bottom: 12px;
+}
+.featured-name { font-family: var(--serif); font-weight: 600; font-size: clamp(26px, 3.4vw, 36px); letter-spacing: -0.02em; margin: 0 0 10px; }
+.featured-desc { font-size: 15px; color: var(--ink-dim); max-width: 56ch; margin: 0 0 12px; }
+.featured-desc b { color: var(--ink); font-weight: 600; }
+.featured-tie { font-family: var(--mono); font-size: 12px; color: var(--ink-faint); font-style: italic; margin: 0 0 16px; padding-left: 11px; border-left: 2px solid color-mix(in srgb, var(--cyan) 40%, transparent); }
+.featured-open { font-family: var(--mono); font-size: 13px; font-weight: 500; color: var(--cyan); display: inline-flex; align-items: center; gap: 8px; }
+.featured-open .arr { transition: transform .26s var(--ease); }
+.featured:hover .featured-open .arr { transform: translateX(5px); }
+.featured-art { width: 200px; opacity: 0.95; }
+.featured-art svg { width: 100%; height: auto; display: block; }
+@media (max-width: 680px) {
+  .featured { grid-template-columns: 1fr; padding: 22px 20px; }
+  .featured-art { display: none; }
+}
+
 /* ---- section headers ------------------------------------- */
 .section { padding: 26px 0 8px; }
 .section-head {

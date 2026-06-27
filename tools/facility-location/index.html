@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Facility Location — Sci-Tools</title>
+<meta name="description" content="An offline facility-siting playground: solve MCLP and p-median with exact and heuristic methods, and see how much optimization actually buys you. By Syed Abbas Ahmad.">
+<link rel="stylesheet" href="../../assets/fonts.css">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="page">
+  <a class="sci-back" href="../../index.html" aria-label="Back to Sci-Tools"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>Sci-Tools</a>
+
+  <header class="masthead">
+    <h1>Facility&nbsp;Location</h1>
+    <p class="sub">Place demand &amp; candidate sites, then solve the siting problem — and see what optimizing actually buys you.</p>
+    <p class="tie">↳ the siting problems behind my <b>MCLP framework</b>, CFLP substation siting &amp; gas-detector-placement work.</p>
+  </header>
+
+  <div class="layout">
+    <!-- ============ MAP ============ -->
+    <section class="stage">
+      <div class="stage-head">
+        <span class="stage-label" id="stageLabel">field · click to place</span>
+        <span class="stage-hint" id="stageHint">tip: place demand, then sites, then Solve</span>
+      </div>
+      <div class="canvas-wrap">
+        <canvas id="map"></canvas>
+      </div>
+    </section>
+
+    <!-- ============ CONTROLS + METRICS ============ -->
+    <aside class="side">
+
+      <div class="panel">
+        <div class="panel-title">Place</div>
+        <div class="seg" id="toolSeg">
+          <button data-tool="demand" class="active">+ Demand</button>
+          <button data-tool="site">+ Site</button>
+          <button data-tool="move">Move</button>
+          <button data-tool="erase">Erase</button>
+        </div>
+        <div class="row">
+          <label>New demand weight <span class="val" id="wVal">1</span></label>
+          <input type="range" id="weight" min="1" max="9" step="1" value="1">
+        </div>
+        <div class="counts" id="counts">0 demand · 0 sites</div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">Problem</div>
+        <div class="seg" id="probSeg">
+          <button data-prob="mclp" class="active">MCLP</button>
+          <button data-prob="pmedian">p-median</button>
+        </div>
+        <div class="row">
+          <label>Facilities to open <b>k</b> <span class="val" id="kVal">2</span></label>
+          <input type="range" id="k" min="1" max="8" step="1" value="2">
+        </div>
+        <div class="row" id="radiusRow">
+          <label>Coverage radius <b>R</b> <span class="val" id="rVal">0.22</span></label>
+          <input type="range" id="radius" min="0.05" max="0.6" step="0.01" value="0.22">
+        </div>
+        <div class="row">
+          <label>Distance</label>
+          <div class="seg small" id="metricSeg">
+            <button data-metric="euclidean" class="active">Euclidean</button>
+            <button data-metric="manhattan">Manhattan</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel actions">
+        <button class="btn primary" id="solveBtn">▶ Solve</button>
+        <button class="btn" id="clearBtn">Clear</button>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">Presets</div>
+        <div class="preset-grid">
+          <button class="chip" data-preset="city">City cluster</button>
+          <button class="chip" data-preset="grid">Uniform grid</button>
+          <button class="chip" data-preset="random">Random</button>
+          <button class="chip" data-preset="corridors">Corridors</button>
+        </div>
+      </div>
+
+      <div class="panel result" id="resultPanel">
+        <div class="panel-title">Result</div>
+        <div class="result-empty" id="resultEmpty">Place points and press <b>Solve</b>.</div>
+        <div class="result-body" id="resultBody" hidden>
+          <div class="headline" id="headline"></div>
+          <div class="readout"><span>objective</span><b id="roObj">—</b></div>
+          <div class="readout"><span id="roSecondLabel">coverage</span><b id="roSecond">—</b></div>
+          <div class="readout"><span>solver</span><b id="roSolver">—</b></div>
+          <div class="readout" id="gapRow"><span>heuristic vs optimum</span><b id="roGap">—</b></div>
+          <div class="readout"><span id="roCeilLabel">build-everywhere ceiling</span><b id="roCeil">—</b></div>
+          <div class="readout"><span>runtime</span><b id="roTime">—</b></div>
+          <button class="btn ghost wide" id="exportBtn">⤓ Export JSON</button>
+        </div>
+      </div>
+
+      <p class="note" id="methodNote"></p>
+    </aside>
+  </div>
+</div>
+
+<script src="src/fl-core.js"></script>
+<script src="src/app.js"></script>
+</body>
+</html>
